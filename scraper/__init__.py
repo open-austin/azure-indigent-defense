@@ -1,5 +1,6 @@
 import logging, os, csv, urllib.parse, json
-from datetime import datetime, timedelta, timezone
+from typing import List
+from datetime import datetime, timedelta, date
 from time import time
 
 import requests
@@ -11,11 +12,43 @@ from shared.helpers import *
 
 
 def main(mytimer: func.TimerRequest) -> None:
-    scrape()
+    start_date = date.today() - timedelta(days=30)
+    end_date = date.today()
+    county = os.getenv("county", "hays")
+    judicial_officers = os.getenv("judicial_officers", "").split(":")
+    ms_wait = int(os.getenv("ms_wait", "200"))
+    log_level = os.getenv("log_level", "INFO")
+    court_calendar_link_text = os.getenv("court_calendar_link_text", "Court Calendar")
+    location = os.getenv("location")
+    test = os.getenv("test", "") == "true"
+    overwrite = test or (os.getenv("overwrite", "") == "true")
+
+    scrape(
+        start_date,
+        end_date,
+        county,
+        judicial_officers,
+        ms_wait,
+        log_level,
+        court_calendar_link_text,
+        location,
+        test,
+        overwrite,
+    )
 
 
-def scrape():
-    args = arg_parser()
+def scrape(
+    start_date: date,
+    end_date: date,
+    county: str,
+    judicial_officers: List[str],
+    ms_wait: int,
+    log_level: str,
+    court_calendar_link_text: str,
+    location: Optional[str],
+    test: bool,
+    overwrite: bool,
+):
 
     session = requests.Session()
     # allow bad ssl and turn off warnings
@@ -26,11 +59,11 @@ def scrape():
 
     logger = logging.getLogger(name="pid: " + str(os.getpid()))
     logging.basicConfig()
-    logging.root.setLevel(level=args.log)
+    logging.root.setLevel(level=log_level)
 
     # make cache directories if not present
     case_html_path = os.path.join(
-        os.path.dirname(__file__), "..", "..", "data", args.county, "case_html"
+        os.path.dirname(__file__), "..", "..", "data", county, "case_html"
     )
     os.makedirs(case_html_path, exist_ok=True)
 
@@ -44,7 +77,7 @@ def scrape():
     ) as file_handle:
         csv_file = csv.DictReader(file_handle)
         for row in csv_file:
-            if row["county"].lower() == args.county.lower():
+            if row["county"].lower() == county.lower():
                 base_url = row["portal"]
                 # add trailing slash if not present, otherwise urljoin breaks
                 if base_url[-1] != "/":
@@ -77,7 +110,7 @@ def scrape():
                 url=urllib.parse.urljoin(base_url, "login.aspx"),
                 logger=logger,
                 http_method=HTTPMethod.GET,
-                ms_wait=args.ms_wait,
+                ms_wait=ms_wait,
                 data=data,
             )
 
@@ -87,13 +120,13 @@ def scrape():
             verification_text="ssSearchHyperlink",
             logger=logger,
             http_method=HTTPMethod.GET,
-            ms_wait=args.ms_wait,
+            ms_wait=ms_wait,
         )
         main_soup = BeautifulSoup(main_page_html, "html.parser")
         # build url for court calendar
         search_page_id = None
         for link in main_soup.select("a.ssSearchHyperlink"):
-            if args.court_calendar_link_text in link.text:
+            if court_calendar_link_text in link.text:
                 search_page_id = link["href"].split("?ID=")[1].split("'")[0]
         if not search_page_id:
             write_debug_and_quit(
@@ -114,7 +147,7 @@ def scrape():
         else "SearchCriteria.SelectedCourt",
         http_method=HTTPMethod.GET,
         logger=logger,
-        ms_wait=args.ms_wait,
+        ms_wait=ms_wait,
     )
     search_soup = BeautifulSoup(search_page_html, "html.parser")
 
@@ -128,9 +161,7 @@ def scrape():
     if odyssey_version < 2017:
         location_option = main_soup.findAll("option")[0]
         logger.info(f"location: {location_option.text}")
-        hidden_values.update(
-            {"NodeDesc": args.location, "NodeID": location_option["value"]}
-        )
+        hidden_values.update({"NodeDesc": location, "NodeID": location_option["value"]})
     else:
         hidden_values["SearchCriteria.SelectedCourt"] = hidden_values[
             "Settings.DefaultLocation"
@@ -147,8 +178,8 @@ def scrape():
         if option.text
     }
     # if juidicial_officers param is not specified, use all of them
-    if not args.judicial_officers:
-        args.judicial_officers = list(judicial_officer_to_ID.keys())
+    if not judicial_officers:
+        judicial_officers = list(judicial_officer_to_ID.keys())
 
     # initialize variables to time script and build a list of already scraped cases
     START_TIME = time()
@@ -158,12 +189,11 @@ def scrape():
 
     # loop through each day
     for date in (
-        args.start_date + timedelta(n)
-        for n in range((args.end_date - args.start_date).days + 1)
+        start_date + timedelta(n) for n in range((end_date - start_date).days + 1)
     ):
         date_string = datetime.strftime(date, "%m/%d/%Y")
         # loop through each judicial officer
-        for JO_name in args.judicial_officers:
+        for JO_name in judicial_officers:
             if JO_name not in judicial_officer_to_ID:
                 logger.error(
                     f"judicial officer {JO_name} not found on search page. Continuing."
@@ -186,7 +216,7 @@ def scrape():
                 data=create_search_form_data(
                     date_string, JO_id, hidden_values, odyssey_version
                 ),
-                ms_wait=args.ms_wait,
+                ms_wait=ms_wait,
             )
             results_soup = BeautifulSoup(results_page_html, "html.parser")
 
@@ -201,7 +231,7 @@ def scrape():
 
                 for case_url in case_urls:
                     case_id = case_url.split("=")[1]
-                    if case_id in cached_case_list and not args.overwrite:
+                    if case_id in cached_case_list and not overwrite:
                         logger.info(f"{case_id} - already scraped case")
                         continue
                     logger.info(f"{case_id} - scraping case")
@@ -211,7 +241,7 @@ def scrape():
                         url=case_url,
                         verification_text="Date Filed",
                         logger=logger,
-                        ms_wait=args.ms_wait,
+                        ms_wait=ms_wait,
                     )
                     # write html case data
                     logger.info(f"{len(case_html)} response string length")
@@ -221,8 +251,9 @@ def scrape():
                         file_handle.write(case_html)
                     if case_id not in cached_case_list:
                         cached_case_list.append(case_id)
-                    if args.test:
+                    if test:
                         logger.info("Testing, stopping after first case")
+                        # bail
                         return
             else:
                 # Need to POST this page to get a JSON of the search results after the initial POST
@@ -236,7 +267,7 @@ def scrape():
                 logger.info(f"{case_list_json['Total']} cases found")
                 for case_json in case_list_json["Data"]:
                     case_id = str(case_json["CaseId"])
-                    if case_id in cached_case_list and not args.overwrite:
+                    if case_id in cached_case_list and not overwrite:
                         logger.info(f"{case_id} already scraped case")
                         continue
                     logger.info(f"{case_id} scraping case")
@@ -246,7 +277,7 @@ def scrape():
                         url=urllib.parse.urljoin(base_url, "Case/CaseDetail"),
                         verification_text="Case Information",
                         logger=logger,
-                        ms_wait=args.ms_wait,
+                        ms_wait=ms_wait,
                         params={
                             "eid": case_json["EncryptedCaseId"],
                             "CaseNumber": case_json["CaseNumber"],
@@ -260,7 +291,7 @@ def scrape():
                         ),
                         verification_text="Financial",
                         logger=logger,
-                        ms_wait=args.ms_wait,
+                        ms_wait=ms_wait,
                         params={
                             "caseId": case_json["CaseId"],
                         },
@@ -273,7 +304,7 @@ def scrape():
                         file_handle.write(case_html)
                     if case_id not in cached_case_list:
                         cached_case_list.append(case_id)
-                    if args.test:
+                    if test:
                         logger.info("Testing, stopping after first case")
                         return
 
