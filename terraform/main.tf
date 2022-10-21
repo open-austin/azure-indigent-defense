@@ -96,19 +96,22 @@ resource "azurerm_linux_function_app" "function_app" {
   location            = var.location
   service_plan_id     = azurerm_service_plan.app_service_plan.id
 
+  functions_extension_version = "~4"
+
+  storage_account_name       = azurerm_storage_account.storage_account.name
+  storage_account_access_key = azurerm_storage_account.storage_account.primary_access_key
+
   # this is where we'll merge all of the environment variables
   app_settings = {
-    "WEBSITE_RUN_FROM_PACKAGE"       = "https://${azurerm_storage_account.storage_account.name}.blob.core.windows.net/${azurerm_storage_container.storage_container.name}/${azurerm_storage_blob.storage_blob.name}${data.azurerm_storage_account_blob_container_sas.storage_account_blob_container_sas.sas}",
-    "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.application_insights.instrumentation_key,
+    "WEBSITE_RUN_FROM_PACKAGE" = "https://${azurerm_storage_account.storage_account.name}.blob.core.windows.net/${azurerm_storage_container.storage_container.name}/${azurerm_storage_blob.storage_blob.name}${data.azurerm_storage_account_blob_container_sas.storage_account_blob_container_sas.sas}",
   }
 
   site_config {
+    application_insights_connection_string = azurerm_application_insights.application_insights.connection_string
+    application_insights_key               = azurerm_application_insights.application_insights.instrumentation_key
     application_stack {
       python_version = "3.8"
     }
   }
-  storage_account_name        = azurerm_storage_account.storage_account.name
-  storage_account_access_key  = azurerm_storage_account.storage_account.primary_access_key
-  functions_extension_version = "~4"
 
 }
