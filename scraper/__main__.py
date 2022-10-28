@@ -7,16 +7,25 @@ import requests
 from bs4 import BeautifulSoup
 import azure.functions as func
 
+# from azure.storage.blob import (
+#     BlobServiceClient,
+#     BlobClient,
+#     ContainerClient,pwd
+#     __version__,
+# )
+
 from shared.helpers import *
 
 
 def main(mytimer: func.TimerRequest) -> None:
     start_date = date.fromisoformat(
-        os.getenv("start_date", str(date.today() - timedelta(days=1)))
+        os.getenv("start_date", (date.today() - timedelta(days=1)).isoformat())
     )
-    end_date = date.fromisoformat(os.getenv("end_date", str(date.today())))
+    x = os.environ
+    end_date = date.fromisoformat(os.getenv("end_date", date.today().isoformat()))
     county = os.getenv("county", "hays")
-    judicial_officers = os.getenv("judicial_officers", "").split(":")
+    judicial_officers = os.getenv("judicial_officers")
+    judicial_officers = judicial_officers.split(":") if judicial_officers else []
     ms_wait = int(os.getenv("ms_wait", "200"))
     log_level = os.getenv("log_level", "INFO")
     court_calendar_link_text = os.getenv("court_calendar_link_text", "Court Calendar")
@@ -72,7 +81,7 @@ def scrape(
     base_url = odyssey_version = notes = None
     with open(
         os.path.join(
-            os.path.dirname(__file__), "..", "..", "resources", "texas_county_data.csv"
+            os.path.dirname(__file__), "..", "resources", "texas_county_data.csv"
         ),
         mode="r",
     ) as file_handle:
@@ -310,3 +319,7 @@ def scrape(
                         return
 
     logger.info(f"\nTime to run script: {round(time() - START_TIME, 2)} seconds")
+
+
+if __name__ == "__main__":
+    main(None)
