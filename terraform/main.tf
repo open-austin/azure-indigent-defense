@@ -91,12 +91,14 @@ data "azurerm_storage_account_blob_container_sas" "storage_account_blob_containe
 }
 
 resource "azurerm_linux_function_app" "function_app" {
-  name                = "id-${var.environment}-function-app"
-  resource_group_name = azurerm_resource_group.resource_group.name
-  location            = var.location
-  service_plan_id     = azurerm_service_plan.app_service_plan.id
+  name                    = "id-${var.environment}-function-app"
+  resource_group_name     = azurerm_resource_group.resource_group.name
+  location                = var.location
+  service_plan_id         = azurerm_service_plan.app_service_plan.id
 
+  builtin_logging_enabled = true
   functions_extension_version = "~4"
+  daily_memory_time_quota = 100
 
   storage_account_name       = azurerm_storage_account.storage_account.name
   storage_account_access_key = azurerm_storage_account.storage_account.primary_access_key
@@ -113,5 +115,15 @@ resource "azurerm_linux_function_app" "function_app" {
       python_version = "3.8"
     }
   }
+
+  # end_date
+  # county
+  # judicial_officers
+  # ms_wait
+  # log_level
+  # court_calendar_link_text
+  # location
+  # test
+  # overwrite
 
 }
