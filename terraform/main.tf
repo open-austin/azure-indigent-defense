@@ -98,7 +98,7 @@ resource "azurerm_linux_function_app" "function_app" {
 
   builtin_logging_enabled = true
   functions_extension_version = "~4"
-  daily_memory_time_quota = 100
+  daily_memory_time_quota = 100000
 
   storage_account_name       = azurerm_storage_account.storage_account.name
   storage_account_access_key = azurerm_storage_account.storage_account.primary_access_key
