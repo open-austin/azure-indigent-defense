@@ -3,9 +3,9 @@
   "bindings": [
     {
       "name": "mytimer",
-      "type": "timerTrigger",
-      "direction": "in",
-      "schedule": "0 */5 * * * *"
+      "dataType": "binary",
+      "type": "httpTrigger",
+      "direction": "in"
     }
   ]
 }
