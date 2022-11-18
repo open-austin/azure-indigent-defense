@@ -12,25 +12,26 @@ from azure.identity import DefaultAzureCredential
 
 from shared.helpers import *
 
+
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Python HTTP trigger function processed a request.')
-
+    logging.info("Python HTTP trigger function processed a request.")
     req_body = req.get_json()
-
     # Get parameters from request payload
-    # TODO - seeing as how this will be running in a context where we want to keep time < 2-15 min, 
+    # TODO - seeing as how this will be running in a context where we want to keep time < 2-15 min,
     # and run many in parallel,
     # do we still need the 'back-up' start/end times (based off today) and 'backup' county ("hays")?
     # May be better to simple require certain parameters?
     start_date = date.fromisoformat(
         req_body.get("start_date", (date.today() - timedelta(days=1)).isoformat())
-        )
+    )
     end_date = date.fromisoformat(req_body.get("end_date", date.today().isoformat()))
     county = req_body.get("county", "hays")
     judicial_officers = req_body.get("judicial_officers", [])
     ms_wait = int(req_body.get("ms_wait", "200"))
     log_level = req_body.get("log_level", "INFO")
-    court_calendar_link_text = req_body.get("court_calendar_link_text", "Court Calendar")
+    court_calendar_link_text = req_body.get(
+        "court_calendar_link_text", "Court Calendar"
+    )
     location = req_body.get("location", None)
     test = bool(req_body.get("test", None))
     overwrite = test or bool(req_body.get("overwrite", None))
@@ -50,7 +51,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     )
 
     print("Returning response...")
-    return func.HttpResponse(f"Finished scraping cases for {judicial_officers} in {county} from {start_date} to {end_date}", status_code=200)
+    return func.HttpResponse(
+        f"Finished scraping cases for {judicial_officers} in {county} from {start_date} to {end_date}",
+        status_code=200,
+    )
+
 
 # The scraper itself
 def scrape(
@@ -124,7 +129,6 @@ def scrape(
             response = request_page_with_retry(
                 session=session,
                 url=urllib.parse.urljoin(base_url, "login.aspx"),
-                logger=logger,
                 http_method=HTTPMethod.GET,
                 ms_wait=ms_wait,
                 data=data,
@@ -134,7 +138,6 @@ def scrape(
             session=session,
             url=base_url,
             verification_text="ssSearchHyperlink",
-            logger=logger,
             http_method=HTTPMethod.GET,
             ms_wait=ms_wait,
         )
@@ -148,7 +151,6 @@ def scrape(
             write_debug_and_quit(
                 verification_text="Court Calendar link",
                 page_text=main_page_html,
-                logger=logger,
             )
         search_url = base_url + "Search.aspx?ID=" + search_page_id
 
@@ -162,7 +164,6 @@ def scrape(
         if odyssey_version < 2017
         else "SearchCriteria.SelectedCourt",
         http_method=HTTPMethod.GET,
-        logger=logger,
         ms_wait=ms_wait,
     )
     search_soup = BeautifulSoup(search_page_html, "html.parser")
@@ -199,9 +200,6 @@ def scrape(
 
     # initialize variables to time script and build a list of already scraped cases
     START_TIME = time()
-    cached_case_list = [
-        file_name.split(".")[0] for file_name in os.listdir(case_html_path)
-    ]
 
     # loop through each day
     for date in (
@@ -228,7 +226,6 @@ def scrape(
                 verification_text="Record Count"
                 if odyssey_version < 2017
                 else "Search Results",
-                logger=logger,
                 data=create_search_form_data(
                     date_string, JO_id, hidden_values, odyssey_version
                 ),
@@ -247,31 +244,21 @@ def scrape(
 
                 for case_url in case_urls:
                     case_id = case_url.split("=")[1]
-                    if case_id in cached_case_list and not overwrite:
-                        logger.info(f"{case_id} - already scraped case")
-                        continue
                     logger.info(f"{case_id} - scraping case")
                     # make request for the case
                     case_html = request_page_with_retry(
                         session=session,
                         url=case_url,
                         verification_text="Date Filed",
-                        logger=logger,
                         ms_wait=ms_wait,
                     )
                     # write html case data
                     logger.info(f"{len(case_html)} response string length")
-                    with open(
-                        os.path.join(case_html_path, f"{case_id}.html"), "w"
-                    ) as file_handle:
-                        file_handle.write(case_html)
-
                     # write to blob
                     logger.info(f"Sending case #{case_id} to blob...")
-                    write_to_blob(os.path.join(case_html_path, f"{case_id}.html"), case_id)
-
-                    if case_id not in cached_case_list:
-                        cached_case_list.append(case_id)
+                    write_string_to_blob(
+                        file_contents=case_html, blob_name=f"{case_id}.html"
+                    )
                     if test:
                         logger.info("Testing, stopping after first case")
                         # bail
@@ -282,22 +269,17 @@ def scrape(
                     session=session,
                     url=urllib.parse.urljoin(base_url, "Hearing/HearingResults/Read"),
                     verification_text="AggregateResults",
-                    logger=logger,
                 )
                 case_list_json = json.loads(case_list_json)
                 logger.info(f"{case_list_json['Total']} cases found")
                 for case_json in case_list_json["Data"]:
                     case_id = str(case_json["CaseId"])
-                    if case_id in cached_case_list and not overwrite:
-                        logger.info(f"{case_id} already scraped case")
-                        continue
                     logger.info(f"{case_id} scraping case")
                     # make request for the case
                     case_html = request_page_with_retry(
                         session=session,
                         url=urllib.parse.urljoin(base_url, "Case/CaseDetail"),
                         verification_text="Case Information",
-                        logger=logger,
                         ms_wait=ms_wait,
                         params={
                             "eid": case_json["EncryptedCaseId"],
@@ -311,7 +293,6 @@ def scrape(
                             base_url, "Case/CaseDetail/LoadFinancialInformation"
                         ),
                         verification_text="Financial",
-                        logger=logger,
                         ms_wait=ms_wait,
                         params={
                             "caseId": case_json["CaseId"],
@@ -319,17 +300,11 @@ def scrape(
                     )
                     # write case html data
                     logger.info(f"{len(case_html)} response string length")
-                    with open(
-                        os.path.join(case_html_path, f"{case_id}.html"), "w"
-                    ) as file_handle:
-                        file_handle.write(case_html)
-
                     # write to blob
                     logger.info(f"Sending case #{case_id} to blob...")
-                    write_to_blob(os.path.join(case_html_path, f"{case_id}.html"), case_id)
-
-                    if case_id not in cached_case_list:
-                        cached_case_list.append(case_id)
+                    write_string_to_blob(
+                        file_contents=case_html, blob_name=f"{case_id}.html"
+                    )
                     if test:
                         logger.info("Testing, stopping after first case")
                         return

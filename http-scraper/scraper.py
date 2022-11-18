@@ -1,14 +1,15 @@
 import logging, os, csv, urllib.parse, json
-from typing import List
+from typing import List, Optional
 from datetime import datetime, timedelta, date
 from time import time
-
+from shared.helpers import *
 import requests
 from bs4 import BeautifulSoup
 import azure.functions as func
 
 from azure.storage.blob import BlobServiceClient, ContainerClient
 from azure.identity import DefaultAzureCredential
+
 
 def scrape(
     start_date: date,

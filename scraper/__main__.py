@@ -64,7 +64,7 @@ def scrape(
         requests.packages.urllib3.exceptions.InsecureRequestWarning
     )
 
-    logger = logging.getLogger(name="pid: " + str(os.getpid()))
+    logger = logging.getLogger(__name__)
     logging.basicConfig()
     logging.root.setLevel(level=log_level)
 
