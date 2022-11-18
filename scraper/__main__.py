@@ -7,6 +7,9 @@ import requests
 from bs4 import BeautifulSoup
 import azure.functions as func
 
+from azure.storage.blob import BlobServiceClient, ContainerClient
+from azure.identity import DefaultAzureCredential
+
 # from azure.storage.blob import (
 #     BlobServiceClient,
 #     BlobClient,
@@ -73,7 +76,7 @@ def scrape(
 
     # make cache directories if not present
     case_html_path = os.path.join(
-        os.path.dirname(__file__), "..", "..", "data", county, "case_html"
+        os.path.dirname(__file__), "..", "data", county, "case_html"
     )
     os.makedirs(case_html_path, exist_ok=True)
 
@@ -187,7 +190,7 @@ def scrape(
         )
         if option.text
     }
-    # if juidicial_officers param is not specified, use all of them
+    # if judicial_officers param is not specified, use all of them
     if not judicial_officers:
         judicial_officers = list(judicial_officer_to_ID.keys())
 
@@ -259,6 +262,7 @@ def scrape(
                         os.path.join(case_html_path, f"{case_id}.html"), "w"
                     ) as file_handle:
                         file_handle.write(case_html)
+                    write_to_blob(os.path.join(case_html_path, f"{case_id}.html"), case_id)
                     if case_id not in cached_case_list:
                         cached_case_list.append(case_id)
                     if test:
@@ -312,6 +316,8 @@ def scrape(
                         os.path.join(case_html_path, f"{case_id}.html"), "w"
                     ) as file_handle:
                         file_handle.write(case_html)
+                    write_to_blob(os.path.join(case_html_path, f"{case_id}.html"), case_id)
+
                     if case_id not in cached_case_list:
                         cached_case_list.append(case_id)
                     if test:
@@ -320,6 +326,17 @@ def scrape(
 
     logger.info(f"\nTime to run script: {round(time() - START_TIME, 2)} seconds")
 
+def write_to_blob(file, case_id):
+    blob_connection_str = os.getenv("blob_connection_str")
+    blob_container_name = os.getenv("blob_container_name")
+    blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
+        blob_connection_str
+    )
+    container = blob_service_client.get_container_client(blob_container_name)
+
+    with open(file, "rb") as data:
+        container.upload_blob(name=case_id, data=data)
+    
 
 if __name__ == "__main__":
     main(None)
