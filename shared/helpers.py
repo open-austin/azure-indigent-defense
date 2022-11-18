@@ -4,7 +4,8 @@ from time import sleep
 import logging
 from typing import Dict, Optional, Tuple, Literal
 from enum import Enum
-
+import xxhash
+from bs4 import BeautifulSoup
 from azure.storage.blob import BlobServiceClient
 
 
@@ -131,3 +132,22 @@ def write_string_to_blob(
         return False
     blob_client.upload_blob(data=file_contents)
     return True
+
+
+def hash_file_contents(file_contents: str) -> str:
+    """Return the xxhash of a given string, cleaned to relevant parts
+
+    Args:
+        file_contents (str): String of the file to be hashed
+
+    Returns:
+        str: hash value of relevant contents
+    """
+    soup = BeautifulSoup(file_contents)
+    body = soup.find("body")
+    balance_table = body.find_all("table")[-1]
+    if "Balance Due" in balance_table.text:
+        balance_table.decompose()
+    relevant_file_str = str(body)
+    filehash = xxhash.xxh64(relevant_file_str).hexdigest()
+    return filehash

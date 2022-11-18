@@ -4,7 +4,6 @@ from datetime import datetime, timedelta, date
 from time import time
 
 from requests import *
-from bs4 import BeautifulSoup
 import azure.functions as func
 
 from azure.storage.blob import BlobServiceClient, ContainerClient
@@ -21,6 +20,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     # and run many in parallel,
     # do we still need the 'back-up' start/end times (based off today) and 'backup' county ("hays")?
     # May be better to simple require certain parameters?
+    # Are we worried about Odyssey noticing a ton of parallel requests?
     start_date = date.fromisoformat(
         req_body.get("start_date", (date.today() - timedelta(days=1)).isoformat())
     )
@@ -206,6 +206,9 @@ def scrape(
         start_date + timedelta(n) for n in range((end_date - start_date).days + 1)
     ):
         date_string = datetime.strftime(date, "%m/%d/%Y")
+        # Need underscore since azure treats slashes as new files
+        date_string_underscore = datetime.strftime(date, "%m_%d_%Y")
+
         # loop through each judicial officer
         for JO_name in judicial_officers:
             if JO_name not in judicial_officer_to_ID:
@@ -255,10 +258,12 @@ def scrape(
                     # write html case data
                     logger.info(f"{len(case_html)} response string length")
                     # write to blob
-                    logger.info(f"Sending case #{case_id} to blob...")
-                    write_string_to_blob(
-                        file_contents=case_html, blob_name=f"{case_id}.html"
+                    file_hash = hash_file_contents(case_html)
+                    blob_name = (
+                        f"{case_id}:{county}:{date_string_underscore}:{file_hash}.html"
                     )
+                    logger.info(f"Sending {blob_name} to blob...")
+                    write_string_to_blob(file_contents=case_html, blob_name=blob_name)
                     if test:
                         logger.info("Testing, stopping after first case")
                         # bail
@@ -301,10 +306,12 @@ def scrape(
                     # write case html data
                     logger.info(f"{len(case_html)} response string length")
                     # write to blob
-                    logger.info(f"Sending case #{case_id} to blob...")
-                    write_string_to_blob(
-                        file_contents=case_html, blob_name=f"{case_id}.html"
+                    file_hash = hash_file_contents(case_html)
+                    blob_name = (
+                        f"{case_id}:{county}:{date_string_underscore}:{file_hash}.html"
                     )
+                    logger.info(f"Sending {blob_name} to blob...")
+                    write_string_to_blob(file_contents=case_html, blob_name=blob_name)
                     if test:
                         logger.info("Testing, stopping after first case")
                         return
