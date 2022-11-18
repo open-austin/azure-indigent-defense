@@ -1,14 +1,17 @@
-import logging, os, csv, urllib.parse, json
-from typing import List
-from datetime import datetime, timedelta, date
+import csv
+import json
+import logging
+import os
+import urllib.parse
+from datetime import date, datetime, timedelta
+from io import BytesIO
 from time import time
-
-import requests
-from bs4 import BeautifulSoup
+from typing import List
 import azure.functions as func
-
+import requests
 from azure.storage.blob import BlobServiceClient, ContainerClient
-from azure.identity import DefaultAzureCredential
+from bs4 import BeautifulSoup
+from shared.helpers import *
 
 # from azure.storage.blob import (
 #     BlobServiceClient,
@@ -16,8 +19,6 @@ from azure.identity import DefaultAzureCredential
 #     ContainerClient,pwd
 #     __version__,
 # )
-
-from shared.helpers import *
 
 
 def main(mytimer: func.TimerRequest) -> None:
@@ -258,11 +259,9 @@ def scrape(
                     )
                     # write html case data
                     logger.info(f"{len(case_html)} response string length")
-                    with open(
-                        os.path.join(case_html_path, f"{case_id}.html"), "w"
-                    ) as file_handle:
-                        file_handle.write(case_html)
-                    write_to_blob(os.path.join(case_html_path, f"{case_id}.html"), case_id)
+                    write_string_to_blob(
+                        file_contents=case_html, blob_name=f"{case_id}.html"
+                    )
                     if case_id not in cached_case_list:
                         cached_case_list.append(case_id)
                     if test:
@@ -312,12 +311,9 @@ def scrape(
                     )
                     # write case html data
                     logger.info(f"{len(case_html)} response string length")
-                    with open(
-                        os.path.join(case_html_path, f"{case_id}.html"), "w"
-                    ) as file_handle:
-                        file_handle.write(case_html)
-                    write_to_blob(os.path.join(case_html_path, f"{case_id}.html"), case_id)
-
+                    write_string_to_blob(
+                        file_contents=case_html, blob_name=f"{case_id}.html"
+                    )
                     if case_id not in cached_case_list:
                         cached_case_list.append(case_id)
                     if test:
@@ -325,6 +321,7 @@ def scrape(
                         return
 
     logger.info(f"\nTime to run script: {round(time() - START_TIME, 2)} seconds")
+
 
 def write_to_blob(file, case_id):
     blob_connection_str = os.getenv("blob_connection_str")
@@ -336,7 +333,31 @@ def write_to_blob(file, case_id):
 
     with open(file, "rb") as data:
         container.upload_blob(name=case_id, data=data)
-    
+
+
+def write_string_to_blob(
+    file_contents: str, blob_name: str, container_name: str = ""
+) -> str:
+    """Write a string of data directly to blob
+
+    Args:
+        file_contents (str): Contents of case file
+        blob_name (str): Name of blob (with convention [case-id]:[county]:[date]:[hash].html)
+        container_name (str, optional): Name of container to write to. Defaults to "".
+
+    Returns:
+        str: container_name
+    """
+    blob_connection_str = os.getenv("blob_connection_str")
+    if not container_name:
+        container_name = os.getenv("blob_container_name")
+    blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
+        blob_connection_str
+    )
+    container = blob_service_client.get_container_client(container_name)
+    container.upload_blob(name=blob_name, data=file_contents)
+    return container_name
+
 
 if __name__ == "__main__":
     main(None)
