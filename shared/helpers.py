@@ -7,6 +7,7 @@ from enum import Enum
 
 from azure.storage.blob import BlobServiceClient
 
+
 def write_debug_and_quit(
     page_text: str, logger: Logger, verification_text: Optional[str] = None
 ) -> None:
@@ -103,13 +104,26 @@ def request_page_with_retry(
             )
     return response.text
 
-def write_to_blob(file, case_id):
+
+def write_string_to_blob(
+    file_contents: str, blob_name: str, container_name: str = ""
+) -> str:
+    """Write a string of data directly to blob
+
+    Args:
+        file_contents (str): Contents of case file
+        blob_name (str): Name of blob (with convention [case-id]:[county]:[date]:[hash].html)
+        container_name (str, optional): Name of container to write to. Defaults to "".
+
+    Returns:
+        str: container_name
+    """
     blob_connection_str = os.getenv("blob_connection_str")
-    blob_container_name = os.getenv("blob_container_name")
+    if not container_name:
+        container_name = os.getenv("blob_container_name")
     blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
         blob_connection_str
     )
-    container = blob_service_client.get_container_client(blob_container_name)
-
-    with open(file, "rb") as data:
-        container.upload_blob(name=case_id, data=data)
+    container = blob_service_client.get_container_client(container_name)
+    container.upload_blob(name=blob_name, data=file_contents)
+    return container_name

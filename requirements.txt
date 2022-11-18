@@ -7,3 +7,4 @@ azure-identity
 azure-storage-blob==12.14.1
 requests
 bs4
+xxhash

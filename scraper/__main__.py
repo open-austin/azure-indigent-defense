@@ -4,7 +4,6 @@ import logging
 import os
 import urllib.parse
 from datetime import date, datetime, timedelta
-from io import BytesIO
 from time import time
 from typing import List
 import azure.functions as func
@@ -12,13 +11,7 @@ import requests
 from azure.storage.blob import BlobServiceClient, ContainerClient
 from bs4 import BeautifulSoup
 from shared.helpers import *
-
-# from azure.storage.blob import (
-#     BlobServiceClient,
-#     BlobClient,
-#     ContainerClient,pwd
-#     __version__,
-# )
+import xxhash
 
 
 def main(mytimer: func.TimerRequest) -> None:
@@ -321,42 +314,6 @@ def scrape(
                         return
 
     logger.info(f"\nTime to run script: {round(time() - START_TIME, 2)} seconds")
-
-
-def write_to_blob(file, case_id):
-    blob_connection_str = os.getenv("blob_connection_str")
-    blob_container_name = os.getenv("blob_container_name")
-    blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
-        blob_connection_str
-    )
-    container = blob_service_client.get_container_client(blob_container_name)
-
-    with open(file, "rb") as data:
-        container.upload_blob(name=case_id, data=data)
-
-
-def write_string_to_blob(
-    file_contents: str, blob_name: str, container_name: str = ""
-) -> str:
-    """Write a string of data directly to blob
-
-    Args:
-        file_contents (str): Contents of case file
-        blob_name (str): Name of blob (with convention [case-id]:[county]:[date]:[hash].html)
-        container_name (str, optional): Name of container to write to. Defaults to "".
-
-    Returns:
-        str: container_name
-    """
-    blob_connection_str = os.getenv("blob_connection_str")
-    if not container_name:
-        container_name = os.getenv("blob_container_name")
-    blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
-        blob_connection_str
-    )
-    container = blob_service_client.get_container_client(container_name)
-    container.upload_blob(name=blob_name, data=file_contents)
-    return container_name
 
 
 if __name__ == "__main__":
