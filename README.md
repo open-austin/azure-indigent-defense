@@ -29,3 +29,4 @@ Be sure to put `judicial_officers` in [] even if you only have one.
     "judicial_officers": ["Updegrove, Robert"]
 }
 ```
+- Publish final app with the command `func azure functionapp publish id-dev-function-app`

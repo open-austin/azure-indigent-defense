@@ -1,22 +1,14 @@
-import logging, os, csv, urllib.parse, json
-from typing import List
-from datetime import datetime, timedelta, date
+import csv
+import json
+import logging
+import os
+import urllib.parse
+from datetime import date, datetime, timedelta
 from time import time
-
-import requests
-from bs4 import BeautifulSoup
+from typing import List
 import azure.functions as func
-
+import requests
 from azure.storage.blob import BlobServiceClient, ContainerClient
-from azure.identity import DefaultAzureCredential
-
-# from azure.storage.blob import (
-#     BlobServiceClient,
-#     BlobClient,
-#     ContainerClient,pwd
-#     __version__,
-# )
-
 from shared.helpers import *
 
 
@@ -24,7 +16,6 @@ def main(mytimer: func.TimerRequest) -> None:
     start_date = date.fromisoformat(
         os.getenv("start_date", (date.today() - timedelta(days=1)).isoformat())
     )
-    x = os.environ
     end_date = date.fromisoformat(os.getenv("end_date", date.today().isoformat()))
     county = os.getenv("county", "hays")
     judicial_officers = os.getenv("judicial_officers")
@@ -121,7 +112,6 @@ def scrape(
             response = request_page_with_retry(
                 session=session,
                 url=urllib.parse.urljoin(base_url, "login.aspx"),
-                logger=logger,
                 http_method=HTTPMethod.GET,
                 ms_wait=ms_wait,
                 data=data,
@@ -131,7 +121,6 @@ def scrape(
             session=session,
             url=base_url,
             verification_text="ssSearchHyperlink",
-            logger=logger,
             http_method=HTTPMethod.GET,
             ms_wait=ms_wait,
         )
@@ -145,7 +134,6 @@ def scrape(
             write_debug_and_quit(
                 verification_text="Court Calendar link",
                 page_text=main_page_html,
-                logger=logger,
             )
         search_url = base_url + "Search.aspx?ID=" + search_page_id
 
@@ -159,7 +147,6 @@ def scrape(
         if odyssey_version < 2017
         else "SearchCriteria.SelectedCourt",
         http_method=HTTPMethod.GET,
-        logger=logger,
         ms_wait=ms_wait,
     )
     search_soup = BeautifulSoup(search_page_html, "html.parser")
@@ -196,15 +183,15 @@ def scrape(
 
     # initialize variables to time script and build a list of already scraped cases
     START_TIME = time()
-    cached_case_list = [
-        file_name.split(".")[0] for file_name in os.listdir(case_html_path)
-    ]
 
     # loop through each day
     for date in (
         start_date + timedelta(n) for n in range((end_date - start_date).days + 1)
     ):
         date_string = datetime.strftime(date, "%m/%d/%Y")
+        # Need underscore since azure treats slashes as new files
+        date_string_underscore = datetime.strftime(date, "%m_%d_%Y")
+
         # loop through each judicial officer
         for JO_name in judicial_officers:
             if JO_name not in judicial_officer_to_ID:
@@ -225,7 +212,6 @@ def scrape(
                 verification_text="Record Count"
                 if odyssey_version < 2017
                 else "Search Results",
-                logger=logger,
                 data=create_search_form_data(
                     date_string, JO_id, hidden_values, odyssey_version
                 ),
@@ -244,27 +230,21 @@ def scrape(
 
                 for case_url in case_urls:
                     case_id = case_url.split("=")[1]
-                    if case_id in cached_case_list and not overwrite:
-                        logger.info(f"{case_id} - already scraped case")
-                        continue
                     logger.info(f"{case_id} - scraping case")
                     # make request for the case
                     case_html = request_page_with_retry(
                         session=session,
                         url=case_url,
                         verification_text="Date Filed",
-                        logger=logger,
                         ms_wait=ms_wait,
                     )
                     # write html case data
                     logger.info(f"{len(case_html)} response string length")
-                    with open(
-                        os.path.join(case_html_path, f"{case_id}.html"), "w"
-                    ) as file_handle:
-                        file_handle.write(case_html)
-                    write_to_blob(os.path.join(case_html_path, f"{case_id}.html"), case_id)
-                    if case_id not in cached_case_list:
-                        cached_case_list.append(case_id)
+                    # write to blob
+                    file_hash_dict = hash_file_contents(case_html)
+                    blob_name = f"{file_hash_dict['case_no']}:{county}:{date_string_underscore}:{file_hash_dict['file_hash']}.html"
+                    logger.info(f"Sending {blob_name} to blob...")
+                    write_string_to_blob(file_contents=case_html, blob_name=blob_name)
                     if test:
                         logger.info("Testing, stopping after first case")
                         # bail
@@ -275,22 +255,17 @@ def scrape(
                     session=session,
                     url=urllib.parse.urljoin(base_url, "Hearing/HearingResults/Read"),
                     verification_text="AggregateResults",
-                    logger=logger,
                 )
                 case_list_json = json.loads(case_list_json)
                 logger.info(f"{case_list_json['Total']} cases found")
                 for case_json in case_list_json["Data"]:
                     case_id = str(case_json["CaseId"])
-                    if case_id in cached_case_list and not overwrite:
-                        logger.info(f"{case_id} already scraped case")
-                        continue
                     logger.info(f"{case_id} scraping case")
                     # make request for the case
                     case_html = request_page_with_retry(
                         session=session,
                         url=urllib.parse.urljoin(base_url, "Case/CaseDetail"),
                         verification_text="Case Information",
-                        logger=logger,
                         ms_wait=ms_wait,
                         params={
                             "eid": case_json["EncryptedCaseId"],
@@ -304,7 +279,6 @@ def scrape(
                             base_url, "Case/CaseDetail/LoadFinancialInformation"
                         ),
                         verification_text="Financial",
-                        logger=logger,
                         ms_wait=ms_wait,
                         params={
                             "caseId": case_json["CaseId"],
@@ -312,31 +286,17 @@ def scrape(
                     )
                     # write case html data
                     logger.info(f"{len(case_html)} response string length")
-                    with open(
-                        os.path.join(case_html_path, f"{case_id}.html"), "w"
-                    ) as file_handle:
-                        file_handle.write(case_html)
-                    write_to_blob(os.path.join(case_html_path, f"{case_id}.html"), case_id)
-
-                    if case_id not in cached_case_list:
-                        cached_case_list.append(case_id)
+                    # write to blob
+                    file_hash_dict = hash_file_contents(case_html)
+                    blob_name = f"{file_hash_dict['case_no']}:{county}:{date_string_underscore}:{file_hash_dict['file_hash']}.html"
+                    logger.info(f"Sending {blob_name} to blob...")
+                    write_string_to_blob(file_contents=case_html, blob_name=blob_name)
                     if test:
                         logger.info("Testing, stopping after first case")
                         return
 
     logger.info(f"\nTime to run script: {round(time() - START_TIME, 2)} seconds")
 
-def write_to_blob(file, case_id):
-    blob_connection_str = os.getenv("blob_connection_str")
-    blob_container_name = os.getenv("blob_container_name")
-    blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
-        blob_connection_str
-    )
-    container = blob_service_client.get_container_client(blob_container_name)
-
-    with open(file, "rb") as data:
-        container.upload_blob(name=case_id, data=data)
-    
 
 if __name__ == "__main__":
     main(None)
