@@ -134,20 +134,22 @@ def write_string_to_blob(
     return True
 
 
-def hash_file_contents(file_contents: str) -> str:
+def hash_file_contents(file_contents: str) -> dict:
     """Return the xxhash of a given string, cleaned to relevant parts
 
     Args:
         file_contents (str): String of the file to be hashed
 
     Returns:
-        str: hash value of relevant contents
+        dict: dict with keys 'hash' and 'case_no'
     """
     soup = BeautifulSoup(file_contents)
+    # Extract county case number
+    case_no = soup.select('div[class="ssCaseDetailCaseNbr"] > span')[0].text
     body = soup.find("body")
     balance_table = body.find_all("table")[-1]
     if "Balance Due" in balance_table.text:
         balance_table.decompose()
     relevant_file_str = str(body)
     filehash = xxhash.xxh64(relevant_file_str).hexdigest()
-    return filehash
+    return {"file_hash": filehash, "case_no": case_no}

@@ -258,10 +258,9 @@ def scrape(
                     # write html case data
                     logger.info(f"{len(case_html)} response string length")
                     # write to blob
-                    file_hash = hash_file_contents(case_html)
-                    blob_name = (
-                        f"{case_id}:{county}:{date_string_underscore}:{file_hash}.html"
-                    )
+                    # write to blob
+                    file_hash_dict = hash_file_contents(case_html)
+                    blob_name = f"{file_hash_dict['case_no']}:{county}:{date_string_underscore}:{file_hash_dict['file_hash']}.html"
                     logger.info(f"Sending {blob_name} to blob...")
                     write_string_to_blob(file_contents=case_html, blob_name=blob_name)
                     if test:
@@ -306,10 +305,9 @@ def scrape(
                     # write case html data
                     logger.info(f"{len(case_html)} response string length")
                     # write to blob
-                    file_hash = hash_file_contents(case_html)
-                    blob_name = (
-                        f"{case_id}:{county}:{date_string_underscore}:{file_hash}.html"
-                    )
+                    # write to blob
+                    file_hash_dict = hash_file_contents(case_html)
+                    blob_name = f"{file_hash_dict['case_no']}:{county}:{date_string_underscore}:{file_hash_dict['file_hash']}.html"
                     logger.info(f"Sending {blob_name} to blob...")
                     write_string_to_blob(file_contents=case_html, blob_name=blob_name)
                     if test:
