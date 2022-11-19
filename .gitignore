@@ -37,6 +37,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.python-version
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -85,3 +86,5 @@ terraform.rc
 
 # Build artifacts
 *.zip
+
+.DS_Store

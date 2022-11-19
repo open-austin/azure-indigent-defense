@@ -1,32 +1,42 @@
-import csv
-import json
-import logging
-import os
-import urllib.parse
-from datetime import date, datetime, timedelta
+import logging, os, csv, urllib.parse, json
+from typing import List, Optional
+from datetime import datetime, timedelta, date
 from time import time
-from typing import List
+
+from requests import *
 import azure.functions as func
-import requests
+
 from azure.storage.blob import BlobServiceClient, ContainerClient
+from azure.identity import DefaultAzureCredential
+
 from shared.helpers import *
 
 
-def main(mytimer: func.TimerRequest) -> None:
+def main(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info("Python HTTP trigger function processed a request.")
+    req_body = req.get_json()
+    # Get parameters from request payload
+    # TODO - seeing as how this will be running in a context where we want to keep time < 2-15 min,
+    # and run many in parallel,
+    # do we still need the 'back-up' start/end times (based off today) and 'backup' county ("hays")?
+    # May be better to simple require certain parameters?
+    # Are we worried about Odyssey noticing a ton of parallel requests?
     start_date = date.fromisoformat(
-        os.getenv("start_date", (date.today() - timedelta(days=1)).isoformat())
+        req_body.get("start_date", (date.today() - timedelta(days=1)).isoformat())
     )
-    end_date = date.fromisoformat(os.getenv("end_date", date.today().isoformat()))
-    county = os.getenv("county", "hays")
-    judicial_officers = os.getenv("judicial_officers")
-    judicial_officers = judicial_officers.split(":") if judicial_officers else []
-    ms_wait = int(os.getenv("ms_wait", "200"))
-    log_level = os.getenv("log_level", "INFO")
-    court_calendar_link_text = os.getenv("court_calendar_link_text", "Court Calendar")
-    location = os.getenv("location")
-    test = os.getenv("test", "") == "true"
-    overwrite = test or (os.getenv("overwrite", "") == "true")
+    end_date = date.fromisoformat(req_body.get("end_date", date.today().isoformat()))
+    county = req_body.get("county", "hays")
+    judicial_officers = req_body.get("judicial_officers", [])
+    ms_wait = int(req_body.get("ms_wait", "200"))
+    log_level = req_body.get("log_level", "INFO")
+    court_calendar_link_text = req_body.get(
+        "court_calendar_link_text", "Court Calendar"
+    )
+    location = req_body.get("location", None)
+    test = bool(req_body.get("test", None))
+    overwrite = test or bool(req_body.get("overwrite", None))
 
+    # Call scraper with given parameters
     scrape(
         start_date,
         end_date,
@@ -40,7 +50,14 @@ def main(mytimer: func.TimerRequest) -> None:
         overwrite,
     )
 
+    print("Returning response...")
+    return func.HttpResponse(
+        f"Finished scraping cases for {judicial_officers} in {county} from {start_date} to {end_date}",
+        status_code=200,
+    )
 
+
+# The scraper itself
 def scrape(
     start_date: date,
     end_date: date,
@@ -241,6 +258,7 @@ def scrape(
                     # write html case data
                     logger.info(f"{len(case_html)} response string length")
                     # write to blob
+                    # write to blob
                     file_hash_dict = hash_file_contents(case_html)
                     blob_name = f"{file_hash_dict['case_no']}:{county}:{date_string_underscore}:{file_hash_dict['file_hash']}.html"
                     logger.info(f"Sending {blob_name} to blob...")
@@ -287,6 +305,7 @@ def scrape(
                     # write case html data
                     logger.info(f"{len(case_html)} response string length")
                     # write to blob
+                    # write to blob
                     file_hash_dict = hash_file_contents(case_html)
                     blob_name = f"{file_hash_dict['case_no']}:{county}:{date_string_underscore}:{file_hash_dict['file_hash']}.html"
                     logger.info(f"Sending {blob_name} to blob...")
@@ -296,7 +315,3 @@ def scrape(
                         return
 
     logger.info(f"\nTime to run script: {round(time() - START_TIME, 2)} seconds")
-
-
-if __name__ == "__main__":
-    main(None)

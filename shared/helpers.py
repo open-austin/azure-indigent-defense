@@ -1,15 +1,18 @@
 import os, sys
 import requests
 from time import sleep
-from logging import Logger
+import logging
 from typing import Dict, Optional, Tuple, Literal
 from enum import Enum
+import xxhash
+from bs4 import BeautifulSoup
+from azure.storage.blob import BlobServiceClient
 
 
 def write_debug_and_quit(
-    page_text: str, logger: Logger, verification_text: Optional[str] = None
+    page_text: str, verification_text: Optional[str] = None
 ) -> None:
-    logger.error(
+    logging.error(
         (
             f"{verification_text} could not be found in page."
             if verification_text
@@ -61,7 +64,6 @@ class HTTPMethod(Enum):
 def request_page_with_retry(
     session: requests.Session,
     url: str,
-    logger: Logger,
     verification_text: Optional[str] = None,
     http_method: Literal[HTTPMethod.POST, HTTPMethod.GET] = HTTPMethod.POST,
     params: Dict[str, str] = {},
@@ -88,16 +90,66 @@ def request_page_with_retry(
             if verification_text:
                 if verification_text not in response.text:
                     failed = True
-                    logger.error(
+                    logging.error(
                         f"Verification text {verification_text} not in response"
                     )
         except requests.RequestException as e:
-            logger.exception(f"Failed to get url {url}, try {i}")
+            logging.exception(f"Failed to get url {url}, try {i}")
             failed = True
         if failed:
             write_debug_and_quit(
                 verification_text=verification_text,
                 page_text=response.text,
-                logger=logger,
             )
     return response.text
+
+
+# Moving this outside of the function so we don't have to reconnect each time...
+# Maybe there's a better way to do this?
+blob_connection_str = os.getenv("blob_connection_str")
+container_name = os.getenv("blob_container_name")
+blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
+    blob_connection_str
+)
+container_client = blob_service_client.get_container_client(container_name)
+
+
+def write_string_to_blob(
+    file_contents: str, blob_name: str, overwrite: bool = False
+) -> bool:
+    """Write a string to a blob file. If
+
+    Args:
+        file_contents (str): String to be written as body of the file
+        blob_name (str): name of the file
+        overwrite (bool, optional): If False, checks if file exists first. Defaults to False.
+    Returns:
+        bool: True if file written, False if not written
+    """
+    blob_client = container_client.get_blob_client(blob_name)
+    if blob_client.exists() and not overwrite:
+        logging.info(msg=f"{blob_name} already exists in {container_name}, skipping.")
+        return False
+    blob_client.upload_blob(data=file_contents)
+    return True
+
+
+def hash_file_contents(file_contents: str) -> dict:
+    """Return the xxhash of a given string, cleaned to relevant parts
+
+    Args:
+        file_contents (str): String of the file to be hashed
+
+    Returns:
+        dict: dict with keys 'hash' and 'case_no'
+    """
+    soup = BeautifulSoup(file_contents)
+    # Extract county case number
+    case_no = soup.select('div[class="ssCaseDetailCaseNbr"] > span')[0].text
+    body = soup.find("body")
+    balance_table = body.find_all("table")[-1]
+    if "Balance Due" in balance_table.text:
+        balance_table.decompose()
+    relevant_file_str = str(body)
+    filehash = xxhash.xxh64(relevant_file_str).hexdigest()
+    return {"file_hash": filehash, "case_no": case_no}
