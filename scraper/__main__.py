@@ -16,7 +16,6 @@ def main(mytimer: func.TimerRequest) -> None:
     start_date = date.fromisoformat(
         os.getenv("start_date", (date.today() - timedelta(days=1)).isoformat())
     )
-    x = os.environ
     end_date = date.fromisoformat(os.getenv("end_date", date.today().isoformat()))
     county = os.getenv("county", "hays")
     judicial_officers = os.getenv("judicial_officers")
