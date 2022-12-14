@@ -13,7 +13,7 @@ from shared.helpers import *
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info("Python HTTP trigger function processed a request.")
+    logging.info("Python HTTP trigger function received a request.")
     req_body = req.get_json()
     # Get parameters from request payload
     # TODO - seeing as how this will be running in a context where we want to keep time < 2-15 min,
@@ -70,6 +70,14 @@ def scrape(
     test: bool,
     overwrite: bool,
 ):
+
+    # initializer blob container client for sending html files to
+    blob_connection_str = os.getenv("AzureWebJobsStorage")
+    container_name_html = os.getenv("blob_container_name_html")
+    blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
+        blob_connection_str
+    )
+    container_client = blob_service_client.get_container_client(container_name_html)
 
     session = requests.Session()
     # allow bad ssl and turn off warnings
@@ -257,12 +265,10 @@ def scrape(
                     )
                     # write html case data
                     logger.info(f"{len(case_html)} response string length")
-                    # write to blob
-                    # write to blob
-                    file_hash_dict = hash_file_contents(case_html)
+                    file_hash_dict = hash_case_html(case_html)
                     blob_name = f"{file_hash_dict['case_no']}:{county}:{date_string_underscore}:{file_hash_dict['file_hash']}.html"
-                    logger.info(f"Sending {blob_name} to blob...")
-                    write_string_to_blob(file_contents=case_html, blob_name=blob_name)
+                    logger.info(f"Sending {blob_name} to {container_name_html} container...")
+                    write_string_to_blob(file_contents=case_html, blob_name=blob_name, container_client=container_client, container_name=container_name_html)
                     if test:
                         logger.info("Testing, stopping after first case")
                         # bail
@@ -306,10 +312,10 @@ def scrape(
                     logger.info(f"{len(case_html)} response string length")
                     # write to blob
                     # write to blob
-                    file_hash_dict = hash_file_contents(case_html)
+                    file_hash_dict = hash_case_html(case_html)
                     blob_name = f"{file_hash_dict['case_no']}:{county}:{date_string_underscore}:{file_hash_dict['file_hash']}.html"
                     logger.info(f"Sending {blob_name} to blob...")
-                    write_string_to_blob(file_contents=case_html, blob_name=blob_name)
+                    write_string_to_blob(file_contents=case_html, blob_name=blob_name, container_client=container_client, container_name=container_name_html)
                     if test:
                         logger.info("Testing, stopping after first case")
                         return
