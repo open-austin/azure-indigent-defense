@@ -24,12 +24,12 @@ def main(myblob: func.InputStream):
     case_num = file_info[0]
     county = file_info[1]
     case_date = file_info[2]
-    file_hash = file_info[3][:-5]
+    html_file_hash = file_info[3][:-5]
     logging.info(f"Retrieved the following metadata: \n"
                 f"Case Date: {case_num}\n"
                 f"County: {county}\n"
                 f"Date Scraped: {case_date}\n"
-                f"File Hash: {file_hash}")
+                f"HTML File Hash: {html_file_hash}")
     
     # get county version year information to determine which parser to use
     base_url = odyssey_version = None
@@ -70,8 +70,7 @@ def main(myblob: func.InputStream):
         container_client = blob_service_client.get_container_client(container_name_json)
 
         # Write JSON data
-        file_hash = xxhash.xxh64(json.dumps(case_data)).hexdigest()
-        blob_name = f"{case_num}:{county}:{case_date}:{file_hash}.json"
+        blob_name = f"{case_num}:{county}:{case_date}:{html_file_hash}.json"
         logging.info(f"Sending {blob_name} to {container_name_json} container...")
         write_string_to_blob(file_contents=json.dumps(case_data), blob_name=blob_name, container_client=container_client, container_name=container_name_json)
 
