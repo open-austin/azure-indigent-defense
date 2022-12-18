@@ -103,19 +103,8 @@ def request_page_with_retry(
             )
     return response.text
 
-
-# Moving this outside of the function so we don't have to reconnect each time...
-# Maybe there's a better way to do this?
-blob_connection_str = os.getenv("blob_connection_str")
-container_name = os.getenv("blob_container_name")
-blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
-    blob_connection_str
-)
-container_client = blob_service_client.get_container_client(container_name)
-
-
 def write_string_to_blob(
-    file_contents: str, blob_name: str, overwrite: bool = False
+    file_contents: str, blob_name: str, container_client, container_name: str, overwrite: bool = False
 ) -> bool:
     """Write a string to a blob file. If
 
@@ -134,16 +123,16 @@ def write_string_to_blob(
     return True
 
 
-def hash_file_contents(file_contents: str) -> dict:
-    """Return the xxhash of a given string, cleaned to relevant parts
+def hash_case_html(file_contents: str) -> dict:
+    """Return the xxhash of a given string of the html of one case, cleaned to only relevant parts
 
     Args:
-        file_contents (str): String of the file to be hashed
+        file_contents (str): String of the html file to be processed
 
     Returns:
         dict: dict with keys 'hash' and 'case_no'
     """
-    soup = BeautifulSoup(file_contents)
+    soup = BeautifulSoup(file_contents, "html.parser", from_encoding="UTF-8")
     # Extract county case number
     case_no = soup.select('div[class="ssCaseDetailCaseNbr"] > span')[0].text
     body = soup.find("body")
