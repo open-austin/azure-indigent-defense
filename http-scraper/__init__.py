@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, date
 from time import time
 
 from requests import *
+from bs4 import BeautifulSoup
 import azure.functions as func
 
 from azure.storage.blob import BlobServiceClient, ContainerClient
@@ -12,7 +13,7 @@ from azure.identity import DefaultAzureCredential
 from shared.helpers import *
 
 
-def main(req: func.HttpRequest) -> func.HttpResponse:
+def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
     logging.info("Python HTTP trigger function received a request.")
     req_body = req.get_json()
     # Get parameters from request payload
@@ -36,42 +37,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     test = bool(req_body.get("test", None))
     overwrite = test or bool(req_body.get("overwrite", None))
 
-    # Call scraper with given parameters
-    scrape(
-        start_date,
-        end_date,
-        county,
-        judicial_officers,
-        ms_wait,
-        log_level,
-        court_calendar_link_text,
-        location,
-        test,
-        overwrite,
-    )
+    # get size of case batches
+    cases_batch_size = int(os.getenv("cases_batch_size"))
 
-    print("Returning response...")
-    return func.HttpResponse(
-        f"Finished scraping cases for {judicial_officers} in {county} from {start_date} to {end_date}",
-        status_code=200,
-    )
-
-
-# The scraper itself
-def scrape(
-    start_date: date,
-    end_date: date,
-    county: str,
-    judicial_officers: List[str],
-    ms_wait: int,
-    log_level: str,
-    court_calendar_link_text: str,
-    location: Optional[str],
-    test: bool,
-    overwrite: bool,
-):
-
-    # initializer blob container client for sending html files to
+    # initialize blob container client for sending html files to
     blob_connection_str = os.getenv("AzureWebJobsStorage")
     container_name_html = os.getenv("blob_container_name_html")
     blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
@@ -79,13 +48,15 @@ def scrape(
     )
     container_client = blob_service_client.get_container_client(container_name_html)
 
+    # initialize session
     session = requests.Session()
     # allow bad ssl and turn off warnings
     session.verify = False
     requests.packages.urllib3.disable_warnings(
         requests.packages.urllib3.exceptions.InsecureRequestWarning
     )
-
+    
+    # initialize logger
     logger = logging.getLogger(name="pid: " + str(os.getpid()))
     logging.basicConfig()
     logging.root.setLevel(level=log_level)
@@ -210,12 +181,12 @@ def scrape(
     START_TIME = time()
 
     # loop through each day
-    for date in (
+    for day in (
         start_date + timedelta(n) for n in range((end_date - start_date).days + 1)
     ):
-        date_string = datetime.strftime(date, "%m/%d/%Y")
+        date_string = datetime.strftime(day, "%m/%d/%Y")
         # Need underscore since azure treats slashes as new files
-        date_string_underscore = datetime.strftime(date, "%m_%d_%Y")
+        date_string_underscore = datetime.strftime(day, "%m_%d_%Y")
 
         # loop through each judicial officer
         for JO_name in judicial_officers:
@@ -253,26 +224,57 @@ def scrape(
 
                 logger.info(f"{len(case_urls)} cases found")
 
-                for case_url in case_urls:
-                    case_id = case_url.split("=")[1]
-                    logger.info(f"{case_id} - scraping case")
-                    # make request for the case
-                    case_html = request_page_with_retry(
-                        session=session,
-                        url=case_url,
-                        verification_text="Date Filed",
-                        ms_wait=ms_wait,
-                    )
-                    # write html case data
-                    logger.info(f"{len(case_html)} response string length")
-                    file_hash_dict = hash_case_html(case_html)
-                    blob_name = f"{file_hash_dict['case_no']}:{county}:{date_string_underscore}:{file_hash_dict['file_hash']}.html"
-                    logger.info(f"Sending {blob_name} to {container_name_html} container...")
-                    write_string_to_blob(file_contents=case_html, blob_name=blob_name, container_client=container_client, container_name=container_name_html)
-                    if test:
-                        logger.info("Testing, stopping after first case")
-                        # bail
-                        return
+                # if there are 10 or less cases, or it's a test run, just scrape now
+                if len(case_urls) <= 10 or test:
+                    for case_url in case_urls:
+                        case_id = case_url.split("=")[1]
+                        logger.info(f"{case_id} - scraping case")
+                        # make request for the case
+                        case_html = request_page_with_retry(
+                            session=session,
+                            url=case_url,
+                            verification_text="Date Filed",
+                            ms_wait=ms_wait,
+                        )
+                        # write html case data
+                        logger.info(f"{len(case_html)} response string length")
+                        file_hash_dict = hash_case_html(case_html)
+                        blob_name = f"{file_hash_dict['case_no']}:{county}:{date_string_underscore}:{file_hash_dict['file_hash']}.html"
+                        logger.info(f"Sending {blob_name} to {container_name_html} container...")
+                        write_string_to_blob(file_contents=case_html, blob_name=blob_name, container_client=container_client, container_name=container_name_html)
+                        if test:
+                            logger.info("Testing, stopping after first case")
+                            # bail
+                            return
+                
+                # else if more than 10 cases, put them on message queue in batches to avoid function timeout
+                # 1 batch of cases = 1 message on queue
+                else:
+                    messages = []
+                    for i in range(0, len(case_urls), cases_batch_size):
+                        message_dict = {
+                            "case-urls": case_urls[i:i+cases_batch_size],
+                            "scrape-params": {
+                                'search-url': search_url,
+                                'base-url': base_url,
+                                'county': county,
+                                'odyssey-version': odyssey_version,
+                                'notes': notes,
+                                'date-string': date_string,
+                                'date-string-underscore': date_string_underscore,
+                                'JO-id': JO_id,
+                                'hidden-values': hidden_values,
+                                'ms-wait': ms_wait,
+                                'location': location  
+                            }
+                        }
+                        message = json.dumps(message_dict)
+                        messages.append(message)
+                    logger.info(f"Writing {len(messages)} batches to message queue")
+                    # put array of messages on queue - expects array of strings 
+                    msg.set(messages)
+
+            # else if odyssey version > 2017 
             else:
                 # Need to POST this page to get a JSON of the search results after the initial POST
                 case_list_json = request_page_with_retry(
@@ -311,7 +313,6 @@ def scrape(
                     # write case html data
                     logger.info(f"{len(case_html)} response string length")
                     # write to blob
-                    # write to blob
                     file_hash_dict = hash_case_html(case_html)
                     blob_name = f"{file_hash_dict['case_no']}:{county}:{date_string_underscore}:{file_hash_dict['file_hash']}.html"
                     logger.info(f"Sending {blob_name} to blob...")
@@ -321,3 +322,9 @@ def scrape(
                         return
 
     logger.info(f"\nTime to run script: {round(time() - START_TIME, 2)} seconds")
+
+    print("Returning response...")
+    return func.HttpResponse(
+        f"Finished scraping cases for {judicial_officers} in {county} from {start_date} to {end_date}",
+        status_code=200,
+    )
