@@ -11,12 +11,16 @@ from shared import pre2017, post2017
 from shared.helpers import *
 
 
+container_name_json = os.getenv("blob_container_name_json")
+COSMOS_DB_CLIENT = None
+
 def main(myblob: func.InputStream):
     logging.info(
         f"Python blob trigger function processed blob \n"
         f"Name: {myblob.name}\n"
         f"Blob Size: {myblob.length} bytes"
     )
+    global container_name_json
 
     # Get case info from file name, which looks like: case-html/15-1367CR-3:hays:12_13_2022:96316e53a9b706e0.html
     # First strip off case-html/ from beginning and .html from end of blob name
@@ -63,24 +67,19 @@ def main(myblob: func.InputStream):
 
         if odyssey_version < 2017:
             case_data = pre2017.parse(case_soup, case_num)
-            logging.info("Pre 2017")
         else:
             logging.info("Post 2017")
 
-        # initialize blob container client for sending json files to
-        blob_connection_str = os.getenv("AzureCosmosStorage")
-        container_name_json = os.getenv("blob_container_name_json")
-        cosmos_service_client: CosmosClient = CosmosClient.from_connection_string(
-            blob_connection_str
-        )
-        cosmos_db_client = cosmos_service_client.get_database_client("cases-json-db")
-        container_client = cosmos_db_client.get_container_client(container_name_json)
+        # Get/initialize a cosmos db client for sending json files to
+        global COSMOS_DB_CLIENT
+        if COSMOS_DB_CLIENT == None:
+            COSMOS_DB_CLIENT = initialize_cosmos_db_client(container_name_json)
 
         # Write case data to cosmos
         blob_id = f"{case_num}:{county}:{case_date}:{html_file_hash}"
         logging.info(f"Sending {blob_id} to {container_name_json} container...")
         case_data["id"] = blob_id
-        container_client.create_item(body=case_data)
+        COSMOS_DB_CLIENT.create_item(body=case_data)
 
     except Exception:
         logging.error(traceback.format_exc())

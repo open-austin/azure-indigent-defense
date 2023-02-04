@@ -13,17 +13,17 @@
     "version": "[3.*, 4.0.0)"
   },
   "concurrency": {
-    "dynamicConcurrencyEnabled": true,
-    "snapshotPersistenceEnabled": true
+    "dynamicConcurrencyEnabled": false,
+    "snapshotPersistenceEnabled": false
   },
   "functionTimeout": "00:10:00",
   "extensions": {
     "queues": {
-        "maxPollingInterval": "00:00:02",
+        "maxPollingInterval": "00:00:30",
         "visibilityTimeout" : "00:00:30",
-        "batchSize": 16,
+        "batchSize": 8,
         "maxDequeueCount": 5,
-        "newBatchThreshold": 8,
+        "newBatchThreshold": 2,
         "messageEncoding": "base64"
     }
   }
