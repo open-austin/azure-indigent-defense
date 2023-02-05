@@ -13,8 +13,13 @@ from azure.identity import DefaultAzureCredential
 from shared.helpers import *
 
 
+container_name_html = os.getenv("blob_container_name_html")
+SESSION = None
+CONTAINER_CLIENT_HTML = None
+
 def main(msg: func.QueueMessage) -> None:
     queue_message = msg.get_body().decode('utf-8')
+    global container_name_html
     logging.info('Python queue trigger function processed a queue item: %s',
                  queue_message)
 
@@ -32,34 +37,32 @@ def main(msg: func.QueueMessage) -> None:
     JO_id = message_dict["scrape-params"]["JO-id"]
     # is this always going to work?
     hidden_values = message_dict["scrape-params"]["hidden-values"]
-    # # TODO - get these from message
-    # ms_wait = 200
-    # location = None
     ms_wait = message_dict["scrape-params"]["ms-wait"]
     location = message_dict["scrape-params"]["location"]
     court_calendar_link_text = "Court Calendar"
 
+    # Get/initialize session
+    # TODO - debug why below lines don't work; using a cached session here messes with getting Odyssey case data even with prelim searches on every invocation
+    # global SESSION
+    # if SESSION == None:
+    #     SESSION = initialize_session()
     # initialize session
-    session = requests.Session()
+    SESSION = requests.Session()
     # allow bad ssl and turn off warnings
-    session.verify = False
+    SESSION.verify = False
     requests.packages.urllib3.disable_warnings(
         requests.packages.urllib3.exceptions.InsecureRequestWarning
     )
 
-    # initialize blob container client for sending html files to
-    blob_connection_str = os.getenv("AzureWebJobsStorage")
-    container_name_html = os.getenv("blob_container_name_html")
-    blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
-        blob_connection_str
-    )
-    container_client = blob_service_client.get_container_client(container_name_html)
+    global CONTAINER_CLIENT_HTML
+    if CONTAINER_CLIENT_HTML == None:
+        CONTAINER_CLIENT_HTML = initialize_blob_container_client(container_name_html)
 
     # The following 2 searches' results are not actually used in this function -- only here because 
     # this search is a necessary preliminary step to get the case URLs to load.
     # hit the search page to gather initial data
     search_page_html = request_page_with_retry(
-        session=session,
+        session=SESSION,
         url=search_url
         if odyssey_version < 2017
         else urllib.parse.urljoin(base_url, "Home/Dashboard/26"),
@@ -72,7 +75,7 @@ def main(msg: func.QueueMessage) -> None:
 
     # POST a request for search results
     results_page_html = request_page_with_retry(
-        session=session,
+        session=SESSION,
         url=search_url
         if odyssey_version < 2017
         else urllib.parse.urljoin(
@@ -93,7 +96,7 @@ def main(msg: func.QueueMessage) -> None:
         logging.info(f"{case_id} - scraping case")
         # make request for the case
         case_html = request_page_with_retry(
-            session=session,
+            session=SESSION,
             url=case_url,
             verification_text="Date Filed"
         )
@@ -103,6 +106,6 @@ def main(msg: func.QueueMessage) -> None:
         file_hash_dict = hash_case_html(case_html)
         blob_name = f"{file_hash_dict['case_no']}:{county}:{date_string_underscore}:{file_hash_dict['file_hash']}.html"
         logging.info(f"Sending {blob_name} to {container_name_html} container...")
-        write_string_to_blob(file_contents=case_html, blob_name=blob_name, container_client=container_client, container_name=container_name_html)
+        write_string_to_blob(file_contents=case_html, blob_name=blob_name, container_client=CONTAINER_CLIENT_HTML, container_name=container_name_html)
 
     logging.info(f"Successfully scraped batch of cases for {JO_id} -- {date_string}")

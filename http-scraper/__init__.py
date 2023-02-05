@@ -13,8 +13,14 @@ from azure.identity import DefaultAzureCredential
 from shared.helpers import *
 
 
+container_name_html = os.getenv("blob_container_name_html")
+SESSION = None
+CONTAINER_CLIENT_HTML = None
+
 def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
     logging.info("Python HTTP trigger function received a request.")
+    global container_name_html
+
     req_body = req.get_json()
     # Get parameters from request payload
     # TODO - seeing as how this will be running in a context where we want to keep time < 2-15 min,
@@ -40,21 +46,15 @@ def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
     # get size of case batches
     cases_batch_size = int(os.getenv("cases_batch_size"))
 
-    # initialize blob container client for sending html files to
-    blob_connection_str = os.getenv("AzureWebJobsStorage")
-    container_name_html = os.getenv("blob_container_name_html")
-    blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
-        blob_connection_str
-    )
-    container_client = blob_service_client.get_container_client(container_name_html)
+    # Get/initialize blob container client for sending html files to
+    global CONTAINER_CLIENT_HTML
+    if CONTAINER_CLIENT_HTML == None:
+        CONTAINER_CLIENT_HTML = initialize_blob_container_client(container_name_html)
 
-    # initialize session
-    session = requests.Session()
-    # allow bad ssl and turn off warnings
-    session.verify = False
-    requests.packages.urllib3.disable_warnings(
-        requests.packages.urllib3.exceptions.InsecureRequestWarning
-    )
+    # Get/initialize session
+    global SESSION
+    if SESSION == None:
+        SESSION = initialize_session()
     
     # initialize logger
     logger = logging.getLogger(name="pid: " + str(os.getpid()))
@@ -106,7 +106,7 @@ def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
             }
 
             response = request_page_with_retry(
-                session=session,
+                session=SESSION,
                 url=urllib.parse.urljoin(base_url, "login.aspx"),
                 http_method=HTTPMethod.GET,
                 ms_wait=ms_wait,
@@ -114,7 +114,7 @@ def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
             )
 
         main_page_html = request_page_with_retry(
-            session=session,
+            session=SESSION,
             url=base_url,
             verification_text="ssSearchHyperlink",
             http_method=HTTPMethod.GET,
@@ -135,7 +135,7 @@ def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
 
     # hit the search page to gather initial data
     search_page_html = request_page_with_retry(
-        session=session,
+        session=SESSION,
         url=search_url
         if odyssey_version < 2017
         else urllib.parse.urljoin(base_url, "Home/Dashboard/26"),
@@ -199,7 +199,7 @@ def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
             logger.info(f"Searching cases on {date_string} for {JO_name}")
             # POST a request for search results
             results_page_html = request_page_with_retry(
-                session=session,
+                session=SESSION,
                 url=search_url
                 if odyssey_version < 2017
                 else urllib.parse.urljoin(
@@ -231,7 +231,7 @@ def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
                         logger.info(f"{case_id} - scraping case")
                         # make request for the case
                         case_html = request_page_with_retry(
-                            session=session,
+                            session=SESSION,
                             url=case_url,
                             verification_text="Date Filed",
                             ms_wait=ms_wait,
@@ -241,7 +241,7 @@ def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
                         file_hash_dict = hash_case_html(case_html)
                         blob_name = f"{file_hash_dict['case_no']}:{county}:{date_string_underscore}:{file_hash_dict['file_hash']}.html"
                         logger.info(f"Sending {blob_name} to {container_name_html} container...")
-                        write_string_to_blob(file_contents=case_html, blob_name=blob_name, container_client=container_client, container_name=container_name_html)
+                        write_string_to_blob(file_contents=case_html, blob_name=blob_name, container_client=CONTAINER_CLIENT_HTML, container_name=container_name_html)
                         if test:
                             logger.info("Testing, stopping after first case")
                             # bail
@@ -278,7 +278,7 @@ def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
             else:
                 # Need to POST this page to get a JSON of the search results after the initial POST
                 case_list_json = request_page_with_retry(
-                    session=session,
+                    session=SESSION,
                     url=urllib.parse.urljoin(base_url, "Hearing/HearingResults/Read"),
                     verification_text="AggregateResults",
                 )
@@ -289,7 +289,7 @@ def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
                     logger.info(f"{case_id} scraping case")
                     # make request for the case
                     case_html = request_page_with_retry(
-                        session=session,
+                        session=SESSION,
                         url=urllib.parse.urljoin(base_url, "Case/CaseDetail"),
                         verification_text="Case Information",
                         ms_wait=ms_wait,
@@ -300,7 +300,7 @@ def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
                     )
                     # make request for financial info
                     case_html += request_page_with_retry(
-                        session=session,
+                        session=SESSION,
                         url=urllib.parse.urljoin(
                             base_url, "Case/CaseDetail/LoadFinancialInformation"
                         ),
@@ -316,7 +316,7 @@ def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
                     file_hash_dict = hash_case_html(case_html)
                     blob_name = f"{file_hash_dict['case_no']}:{county}:{date_string_underscore}:{file_hash_dict['file_hash']}.html"
                     logger.info(f"Sending {blob_name} to blob...")
-                    write_string_to_blob(file_contents=case_html, blob_name=blob_name, container_client=container_client, container_name=container_name_html)
+                    write_string_to_blob(file_contents=case_html, blob_name=blob_name, container_client=CONTAINER_CLIENT_HTML, container_name=container_name_html)
                     if test:
                         logger.info("Testing, stopping after first case")
                         return

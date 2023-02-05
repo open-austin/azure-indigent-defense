@@ -8,6 +8,37 @@ from enum import Enum
 import xxhash
 from bs4 import BeautifulSoup
 from azure.storage.blob import BlobServiceClient
+from azure.cosmos import CosmosClient
+
+
+def initialize_session():
+    # initialize session
+    session = requests.Session()
+    # allow bad ssl and turn off warnings
+    session.verify = False
+    requests.packages.urllib3.disable_warnings(
+        requests.packages.urllib3.exceptions.InsecureRequestWarning
+    )
+    return session
+
+
+def initialize_blob_container_client(container_name):
+    blob_connection_str = os.getenv("AzureWebJobsStorage")
+    blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
+        blob_connection_str
+    )
+    container_client = blob_service_client.get_container_client(container_name)
+    return container_client
+
+
+def initialize_cosmos_db_client(container_name):
+    cosmos_connection_str = os.getenv("AzureCosmosStorage")
+    cosmos_service_client: CosmosClient = CosmosClient.from_connection_string(
+        cosmos_connection_str
+    )
+    cosmos_db_client = cosmos_service_client.get_database_client("cases-json-db")
+    container_client = cosmos_db_client.get_container_client(container_name)
+    return container_client
 
 
 def write_debug_and_quit(
