@@ -24,13 +24,13 @@ def main(myblob: func.InputStream):
 
     # Get case info from file name, which looks like: case-html/15-1367CR-3:hays:12_13_2022:96316e53a9b706e0.html
     # First strip off case-html/ from beginning and .html from end of blob name
-    stripped_name = myblob.name.strip("case-html/.")
+    stripped_name = myblob.name.replace("case-html/", "").replace(".html", "")
     # Then split by : as delimiter
     file_info = stripped_name.split(":")
     case_num = file_info[0]
     county = file_info[1]
     case_date = file_info[2]
-    html_file_hash = file_info[3][:-5]
+    html_file_hash = file_info[3]
     logging.info(
         f"Retrieved the following metadata: \n"
         f"Case Date: {case_num}\n"
