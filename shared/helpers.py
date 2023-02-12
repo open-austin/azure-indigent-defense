@@ -1,44 +1,13 @@
 import os, sys
 import requests
 from time import sleep
-from datetime import date
 import logging
 from typing import Dict, Optional, Tuple, Literal
 from enum import Enum
 import xxhash
 from bs4 import BeautifulSoup
 from azure.storage.blob import BlobServiceClient
-from azure.cosmos import CosmosClient
-
-
-def initialize_session():
-    # initialize session
-    session = requests.Session()
-    # allow bad ssl and turn off warnings
-    session.verify = False
-    requests.packages.urllib3.disable_warnings(
-        requests.packages.urllib3.exceptions.InsecureRequestWarning
-    )
-    return session
-
-
-def initialize_blob_container_client(container_name):
-    blob_connection_str = os.getenv("AzureWebJobsStorage")
-    blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
-        blob_connection_str
-    )
-    container_client = blob_service_client.get_container_client(container_name)
-    return container_client
-
-
-def initialize_cosmos_db_client(container_name):
-    cosmos_connection_str = os.getenv("AzureCosmosStorage")
-    cosmos_service_client: CosmosClient = CosmosClient.from_connection_string(
-        cosmos_connection_str
-    )
-    cosmos_db_client = cosmos_service_client.get_database_client("cases-json-db")
-    container_client = cosmos_db_client.get_container_client(container_name)
-    return container_client
+import datetime as dt
 
 
 def write_debug_and_quit(
@@ -59,17 +28,27 @@ def write_debug_and_quit(
 
 # helper function to make form data
 def create_search_form_data(
-    date: str, JO_id: str, hidden_values: Dict[str, str], odyssey_version: int
+    date: str,
+    JO_id: str,
+    hidden_values: Dict[str, str],
+    odyssey_version: int,
+    daysback: int = 0,
 ) -> Dict[str, str]:
     form_data = {}
     form_data.update(hidden_values)
+    end_date = date
+    date_format = "%Y-%m-%d"
+    start_date = dt.datetime.strftime(
+        dt.datetime.strptime("2022-11-15", date_format) - dt.timedelta(days=daysback),
+        date_format,
+    )
     if odyssey_version < 2017:
         form_data.update(
             {
                 "SearchBy": "3",
                 "cboJudOffc": JO_id,
-                "DateSettingOnAfter": date,
-                "DateSettingOnBefore": date,
+                "DateSettingOnAfter": start_date,
+                "DateSettingOnBefore": end_date,
                 "SearchType": "JUDOFFC",  # Search by Judicial Officer
                 "SearchMode": "JUDOFFC",
                 "CaseCategories": "CR",  # "CR,CV,FAM,PR" criminal, civil, family, probate and mental health - these are the options
@@ -81,8 +60,8 @@ def create_search_form_data(
                 "SearchCriteria.SelectedHearingType": "Criminal Hearing Types",
                 "SearchCriteria.SearchByType": "JudicialOfficer",
                 "SearchCriteria.SelectedJudicialOfficer": JO_id,
-                "SearchCriteria.DateFrom": date,
-                "SearchCriteria.DateTo": date,
+                "SearchCriteria.DateFrom": start_date,
+                "SearchCriteria.DateTo": end_date,
             }
         )
     return form_data
@@ -135,27 +114,13 @@ def request_page_with_retry(
             )
     return response.text
 
-def create_single_case_search_form_data(hidden_values: Dict[str, str], case_number: str):
-    form_data = {}
-    form_data.update(hidden_values)
-    os_specific_time_format = "%#m/%#d/%Y" if os.name == 'nt' else "%-m/%-d/%Y"
-    form_data.update(
-        {
-            "__EVENTTARGET":"",
-            "SearchBy": "0",
-            "DateSettingOnAfter": "1/1/1970",
-            "DateSettingOnBefore": date.today().strftime(os_specific_time_format),
-            "SearchType": "CASE",  # Search by case id
-            "SearchMode": "CASENUMBER",
-            "CourtCaseSearchValue": case_number,
-            "CaseCategories": "",
-            "cboJudOffc":"38501",
-        }
-    )
-    return form_data
 
 def write_string_to_blob(
-    file_contents: str, blob_name: str, container_client, container_name: str, overwrite: bool = False
+    file_contents: str,
+    blob_name: str,
+    container_client,
+    container_name: str,
+    overwrite: bool = False,
 ) -> bool:
     """Write a string to a blob file. If
 
