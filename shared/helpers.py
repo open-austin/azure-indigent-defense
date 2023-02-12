@@ -23,7 +23,7 @@ def initialize_session():
 
 
 def initialize_blob_container_client(container_name):
-    blob_connection_str = os.getenv("AzureWebJobsStorage")
+    blob_connection_str = os.getenv("ScrapeDataStorage")
     blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(
         blob_connection_str
     )

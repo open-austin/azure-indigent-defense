@@ -21,7 +21,7 @@
       "direction": "out",
       "name": "msg",
       "queueName": "cases-to-scrape",
-      "connection": "AzureWebJobsStorage"
+      "connection": "ScrapeDataStorage"
     }
   ]
 }

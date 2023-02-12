@@ -36,4 +36,4 @@ Note that this function produces a lot of output after starting the function app
 
 ### Deployment
 
-- Publish final app with the command `func azure functionapp publish indigent-defense-stats`. It's a good idea to verify code both locally and deployed before merging.
+- Publish to Azure with the command `func azure functionapp publish indigent-defense-stats-dev-function-app`. (You need to be logged in to Azure CLI.) That's our dev environment, so deploy there as much as you like; it's meant to be played with and broken. When you run the function app locally, it will still be talking to blob containers, a message queue, and a Cosmos DB on Azure, so 95% of the time local testing should be fine. However, it's a good idea to at least verify final code on Azure before opening a pull request. Changes merged into main will then be published on the prod environment.
