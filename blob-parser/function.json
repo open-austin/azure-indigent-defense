@@ -6,7 +6,7 @@
       "type": "blobTrigger",
       "direction": "in",
       "path": "case-html/{name}",
-      "connection": "AzureWebJobsStorage"
+      "connection": "ScrapeDataStorage"
     }
   ]
 }
