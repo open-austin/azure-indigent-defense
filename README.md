@@ -37,3 +37,29 @@ Note that this function produces a lot of output after starting the function app
 ### Deployment
 
 - Publish to Azure with the command `func azure functionapp publish indigent-defense-stats-dev-function-app`. (You need to be logged in to Azure CLI.) That's our dev environment, so deploy there as much as you like; it's meant to be played with and broken. When you run the function app locally, it will still be talking to blob containers, a message queue, and a Cosmos DB on Azure, so 95% of the time local testing should be fine. However, it's a good idea to at least verify final code on Azure before opening a pull request. Changes merged into main will then be published on the prod environment.
+
+## Devlopment via Docker
+
+Build and run the container with `docker-compose`
+
+```sh
+docker-compose up
+```
+
+This will mount the repository as a volume in the container, so you can continue
+to edit code as normal.
+
+### Notes for Macbook M1 Users
+
+The container runs using amd64 emulation due to Microsoft's lack of Linux
+aarch64 binaries for Azure Functions Tools. Emulation causes the container to
+run considerably slower than natively.
+
+In order for the emulation to work properly, you must meet the following requirements:
+
+- Docker version 4.16.0+
+- macOS 13+
+- Enable `Use rosetta for x86/amd64` in Settings > Features in Development
+
+If you see the error `Function not implemented`, this likely means you aren't
+configured properly for emulation.
