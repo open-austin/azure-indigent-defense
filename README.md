@@ -57,9 +57,17 @@ run considerably slower than natively.
 
 In order for the emulation to work properly, you must meet the following requirements:
 
-- Docker version 4.16.0+
 - macOS 13+
-- Enable `Use rosetta for x86/amd64` in Settings > Features in Development
+  - Rosetta 2 installed
+- Docker version 4.16.0+
+  - Enable `Use Virtualization framework` in Docker Destkop Settings > General
+  - Enable `Use rosetta for x86/amd64` in Docker Desktop Settings > Features in Development
 
 If you see the error `Function not implemented`, this likely means you aren't
-configured properly for emulation.
+configured properly for emulation. Ensure the following:
+
+- The above requirements are all met by your machine
+- Your macOS terminal is **not** being emulated when you build & run docker compose
+  - The `arch` command should print `arm64`
+- That you built the container image _after_ installing everything
+  - If you adjusted one of these configurations after building the image, try re-building with `docker-compose build --no-cache`
