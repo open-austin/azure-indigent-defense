@@ -1,4 +1,4 @@
-FROM  --platform=linux/amd64 python:3.8-slim-bullseye
+FROM  --platform=linux/amd64 python:3.9-slim-bullseye
 WORKDIR /app
 
 # Install Azure CLI and Azure Func Tools v4
