@@ -1,0 +1,13 @@
+version: '2'
+services:
+  python:
+    build: .
+    command: sh -c "func start"
+    platform: linux/arm64
+    ports:
+      - 7071:7071
+    environment:
+      - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+    working_dir: /app
+    volumes:
+      - ./:/app
