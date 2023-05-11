@@ -2,26 +2,20 @@
   "scriptFile": "__init__.py",
   "bindings": [
     {
-      "authLevel": "anonymous",
+      "authLevel": "function",
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
       "methods": [
         "get",
         "post"
-      ]
+      ],
+      "route": "{*route}"
     },
     {
       "type": "http",
       "direction": "out",
       "name": "$return"
-    },
-    {
-      "type": "queue",
-      "direction": "out",
-      "name": "msg",
-      "queueName": "cases-to-scrape",
-      "connection": "ScrapeDataStorage"
     }
   ]
 }

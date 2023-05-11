@@ -6,7 +6,6 @@ from time import time
 from requests import *
 from bs4 import BeautifulSoup
 import azure.functions as func
-
 from azure.storage.blob import BlobServiceClient, ContainerClient
 from azure.identity import DefaultAzureCredential
 
@@ -55,7 +54,7 @@ def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
     global SESSION
     if SESSION == None:
         SESSION = initialize_session()
-    
+
     # initialize logger
     logger = logging.getLogger(name="pid: " + str(os.getpid()))
     logging.basicConfig()
@@ -246,7 +245,7 @@ def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
                             logger.info("Testing, stopping after first case")
                             # bail
                             return
-                
+
                 # else if more than 10 cases, put them on message queue in batches to avoid function timeout
                 # 1 batch of cases = 1 message on queue
                 else:
@@ -265,16 +264,16 @@ def main(req: func.HttpRequest, msg: func.Out[List[str]]) -> func.HttpResponse:
                                 'JO-id': JO_id,
                                 'hidden-values': hidden_values,
                                 'ms-wait': ms_wait,
-                                'location': location  
+                                'location': location
                             }
                         }
                         message = json.dumps(message_dict)
                         messages.append(message)
                     logger.info(f"Writing {len(messages)} batches to message queue")
-                    # put array of messages on queue - expects array of strings 
+                    # put array of messages on queue - expects array of strings
                     msg.set(messages)
 
-            # else if odyssey version > 2017 
+            # else if odyssey version > 2017
             else:
                 # Need to POST this page to get a JSON of the search results after the initial POST
                 case_list_json = request_page_with_retry(
