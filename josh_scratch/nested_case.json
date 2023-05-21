@@ -1,0 +1,440 @@
+[
+    {
+        "case_id": "12861048",
+        "case_number": "13-2936CR",
+        "attorney_type": "Court Appointed",
+        "earliest_charge_date": "2013-08-24",
+        "has_evidence_of_representation": false,
+        "charge_desc": [
+            "Obstruction/Resisting"
+        ],
+        "charge_category": [
+            "Public Order"
+        ],
+        "charge_level": [
+            "Misdemeanor B"
+        ],
+        "motions": [],
+        "id": "cb166570-068b-4523-a208-6e4d69876ce6",
+        "_rid": "occNAJ9IjtL9JgAAAAAAAA==",
+        "_self": "dbs/occNAA==/colls/occNAJ9IjtI=/docs/occNAJ9IjtL9JgAAAAAAAA==/",
+        "_etag": "\"0e008069-0000-0400-0000-63a92ca70000\"",
+        "_attachments": "attachments/",
+        "_ts": 1672031399
+    },
+    {
+        "case_id": "12861048",
+        "case_number": "13-2936CR",
+        "attorney_type": "Court Appointed",
+        "earliest_charge_date": "2013-08-24",
+        "has_evidence_of_representation": false,
+        "charge_desc": [
+            "Obstruction/Resisting"
+        ],
+        "charge_category": [
+            "Public Order"
+        ],
+        "charge_level": [
+            "Misdemeanor B"
+        ],
+        "motions": [],
+        "id": "c1c03494-da1d-4ecc-a4d0-0690d3d44751",
+        "_rid": "occNAJ9IjtLBewAAAAAAAA==",
+        "_self": "dbs/occNAA==/colls/occNAJ9IjtI=/docs/occNAJ9IjtLBewAAAAAAAA==/",
+        "_etag": "\"0e0044c9-0000-0400-0000-63a92d660000\"",
+        "_attachments": "attachments/",
+        "_ts": 1672031590
+    },
+    {
+        "case_id": "12861048",
+        "case_number": "13-2936CR",
+        "defense_attorney": "Daniel R McCormack",
+        "attorney_type": "Court Appointed",
+        "earliest_charge_date": "2013-08-24",
+        "charges": [
+            {
+                "charge_id": 1,
+                "charge_name": "INTERFERE W/PUBLIC DUTIES",
+                "num_counts": 1,
+                "charge_date": "2013-08-24",
+                "is_primary_charge": true,
+                "level": "Misdemeanor B",
+                "statute": "38.15(b)",
+                "statute_chapter": "38",
+                "statute_section": "15",
+                "statute_subsection": "b",
+                "charge_desc": "Obstruction/Resisting",
+                "offense_category_desc": "Obstruction - law enforcement",
+                "offense_type_desc": "Public Order"
+            }
+        ],
+        "events": [
+            {
+                "event_date": "2013-08-25",
+                "event_name": "Probable Cause Affidavit"
+            },
+            {
+                "event_date": "2013-08-25",
+                "event_name": "Magistrate Warning"
+            },
+            {
+                "event_date": "2013-10-24",
+                "event_name": "Complaint & Information (Open Case)"
+            },
+            {
+                "event_date": "2013-11-01",
+                "event_name": "Arraignment"
+            },
+            {
+                "event_date": "2013-11-13",
+                "event_name": "Discovery Receipt"
+            },
+            {
+                "event_date": "2013-11-14",
+                "event_name": "Discovery Receipt"
+            },
+            {
+                "event_date": "2013-12-19",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2013-12-19",
+                "event_name": "Order Permitting Withdrawal"
+            },
+            {
+                "event_date": "2013-12-19",
+                "event_name": "Motion To Withdraw As Counsel"
+            },
+            {
+                "event_date": "2014-01-24",
+                "event_name": "Announcement"
+            },
+            {
+                "event_date": "2014-02-19",
+                "event_name": "Letter Of Representation"
+            },
+            {
+                "event_date": "2014-02-24",
+                "event_name": "Discovery Receipt"
+            },
+            {
+                "event_date": "2014-02-28",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2014-03-03",
+                "event_name": "Discovery Receipt"
+            },
+            {
+                "event_date": "2014-04-03",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2014-05-15",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2014-05-20",
+                "event_name": "Discovery Receipt"
+            },
+            {
+                "event_date": "2014-07-03",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2014-09-04",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2014-10-16",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2014-11-20",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2015-01-15",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2015-03-12",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2015-04-23",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2015-06-25",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2015-08-27",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2015-10-29",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2015-12-10",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2016-02-11",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2016-03-10",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2016-05-12",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2016-06-30",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2016-08-11",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2016-09-29",
+                "event_name": "Plea/Sentencing"
+            },
+            {
+                "event_date": "2016-11-17",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2017-01-12",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2017-02-16",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2017-03-22",
+                "event_name": "Plea/Sentencing"
+            },
+            {
+                "event_date": "2017-03-23",
+                "event_name": "Order Appointing Defense Counsel"
+            },
+            {
+                "event_date": "2017-03-23",
+                "event_name": "Plea Of Guilty"
+            },
+            {
+                "event_date": "2017-03-23",
+                "event_name": "Veterans Court Application"
+            },
+            {
+                "event_date": "2017-03-23",
+                "event_name": "Veterans Court Pre-Trial Intervention"
+            },
+            {
+                "event_date": "2017-04-05",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2017-04-19",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2017-05-03",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2017-05-17",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2017-05-31",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2017-06-14",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2017-06-28",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2017-07-19",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2017-08-09",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2017-09-13",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2017-10-18",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2017-11-15",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2017-12-20",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2018-01-17",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2018-01-31",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2018-03-14",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2018-04-25",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2018-05-09",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2018-05-14",
+                "event_name": "Motion Removing Veteran From Veterans Court"
+            },
+            {
+                "event_date": "2018-05-14",
+                "event_name": "Proposed Order"
+            },
+            {
+                "event_date": "2018-05-23",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2018-06-27",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2018-07-25",
+                "event_name": "Veterans Court Status Hearing"
+            },
+            {
+                "event_date": "2018-08-07",
+                "event_name": "Notice"
+            },
+            {
+                "event_date": "2018-08-13",
+                "event_name": "Other"
+            },
+            {
+                "event_date": "2018-08-14",
+                "event_name": "Order On Motion To Withdraw As Counsel"
+            },
+            {
+                "event_date": "2018-08-14",
+                "event_name": "Order Removing From Veterans Court"
+            },
+            {
+                "event_date": "2018-09-18",
+                "event_name": "Plea/Sentencing"
+            },
+            {
+                "event_date": "2018-10-30",
+                "event_name": "Plea/Sentencing"
+            },
+            {
+                "event_date": "2018-10-30",
+                "event_name": "Bill Of Cost"
+            },
+            {
+                "event_date": "2018-10-30",
+                "event_name": "Deferred Adjudication Judgment"
+            },
+            {
+                "event_date": "2018-10-30",
+                "event_name": "Courts Written Admonishment & Trial Court Appeal"
+            },
+            {
+                "event_date": "2019-05-28",
+                "event_name": "Motion To Adjudicate (Reopen Case)"
+            },
+            {
+                "event_date": "2019-10-22",
+                "event_name": "Motion To Adjudicate Guilt"
+            },
+            {
+                "event_date": "2019-10-22",
+                "event_name": "Courts Written Admonishment & Trial Court Appeal"
+            },
+            {
+                "event_date": "2019-10-22",
+                "event_name": "Judgment & Sentence/After Def Adjudication"
+            },
+            {
+                "event_date": "2019-10-22",
+                "event_name": "Conditions Of Community Supervision"
+            },
+            {
+                "event_date": "2021-01-04",
+                "event_name": "Motion To Revoke Probation/Adjudicate Guilt (Reopen Case)"
+            },
+            {
+                "event_date": "2021-09-01",
+                "event_name": "Magistration Documents"
+            },
+            {
+                "event_date": "2021-09-01",
+                "event_name": "Magistrate Warning"
+            },
+            {
+                "event_date": "2021-09-07",
+                "event_name": "Certificate Of Contact"
+            },
+            {
+                "event_date": "2021-09-09",
+                "event_name": "Canceled"
+            },
+            {
+                "event_date": "2021-09-09",
+                "event_name": "Discovery Receipt"
+            },
+            {
+                "event_date": "2021-09-16",
+                "event_name": "Motion To Revoke"
+            },
+            {
+                "event_date": "2021-09-16",
+                "event_name": "Joint Request For Plea By Video Conference Under Tccp 27.18"
+            },
+            {
+                "event_date": "2021-09-16",
+                "event_name": "Court's Written Admonishments"
+            },
+            {
+                "event_date": "2021-09-16",
+                "event_name": "Order Revoking Probation"
+            },
+            {
+                "event_date": "2021-09-30",
+                "event_name": "Canceled"
+            }
+        ],
+        "id": "b5b11d8d-1b43-4181-b317-cde5633534df",
+        "_rid": "occNAJ9IjtLYzgAAAAAAAA==",
+        "_self": "dbs/occNAA==/colls/occNAJ9IjtI=/docs/occNAJ9IjtLYzgAAAAAAAA==/",
+        "_etag": "\"c800a436-0000-0400-0000-63d2205a0000\"",
+        "_attachments": "attachments/",
+        "_ts": 1674715226
+    }
+]
