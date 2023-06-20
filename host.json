@@ -10,7 +10,7 @@
   },
   "extensionBundle": {
     "id": "Microsoft.Azure.Functions.ExtensionBundle",
-    "version": "[3.*, 4.0.0)"
+    "version": "[2.*, 4.0.0)"
   },
   "concurrency": {
     "dynamicConcurrencyEnabled": false,
@@ -18,6 +18,10 @@
   },
   "functionTimeout": "00:10:00",
   "extensions": {
+    "http": 
+    {
+        "routePrefix": ""
+    },
     "queues": {
         "maxPollingInterval": "00:00:30",
         "visibilityTimeout" : "00:00:30",
