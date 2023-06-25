@@ -1,0 +1,259 @@
+uccs_code,charge_desc,offense_category_code,offense_category_desc,offense_type_code,offense_type_desc
+1010,Murder,1,Murder,1,Violent
+1011,Attempted Murder,1,Murder,1,Violent
+1012,Conspiracy to Commit Murder,1,Murder,1,Violent
+1020,Unspecified Homicide,2,Unspecified homicide,1,Violent
+1021,"Unspecified Homicide, Attempted",2,Unspecified homicide,1,Violent
+1022,"Unspecified Homicide, Conspiracy",2,Unspecified homicide,1,Violent
+1030,Voluntary Manslaughter,3,Voluntary/nonnegligent manslaughter,1,Violent
+1031,"Voluntary Manslaughter, Attempted",3,Voluntary/nonnegligent manslaughter,1,Violent
+1032,"Voluntary Manslaughter,Conspiracy",3,Voluntary/nonnegligent manslaughter,1,Violent
+1040,Vehicular Manslaughter,3,Voluntary/nonnegligent manslaughter,1,Violent
+1041,"Vehicular Manslaughter, Attempted",3,Voluntary/nonnegligent manslaughter,1,Violent
+1042,"Vehicular Manslaughter, Conspiracy",3,Voluntary/nonnegligent manslaughter,1,Violent
+1050,Involuntary Manslaughter,4,Manslaughter - non-vehicular,1,Violent
+1051,"Involuntary Manslaughter, Attempt",4,Manslaughter - non-vehicular,1,Violent
+1052,"Involuntary Manslaughter, Conspiracy",4,Manslaughter - non-vehicular,1,Violent
+1060,Kidnapping,5,Kidnapping,1,Violent
+1061,"Kidnapping, Attempted",5,Kidnapping,1,Violent
+1062,"Kidnapping, Conspiracy",5,Kidnapping,1,Violent
+1070,Rape,6,Rape - force,1,Violent
+1071,"Rape, Attempted",6,Rape - force,1,Violent
+1072,"Rape, Conspiracy",6,Rape - force,1,Violent
+1080,Statutory Rape,7,Rape - statutory - no force,1,Violent
+1081,"Statutory Rape, Attempted",7,Rape - statutory - no force,1,Violent
+1082,"Statutory Rape, Conspiracy",7,Rape - statutory - no force,1,Violent
+1090,Child Molestation,8,Lewd act with children,1,Violent
+1091,"Child Molestation, Attempted",8,Lewd act with children,1,Violent
+1092,"Child Molestation, Conspiracy",8,Lewd act with children,1,Violent
+1100,Sexual Assault,9,Sexual assault - other,1,Violent
+1101,"Sexual Assault, Attempted",9,Sexual assault - other,1,Violent
+1102,"Sexual Assault, Conspiracy",9,Sexual assault - other,1,Violent
+1110,"Human Trafficking, Sex - child",10,Human Trafficking,1,Violent
+1111,"Human Trafficking, Sex - child, Attempted",10,Human Trafficking,1,Violent
+1112,"Human Trafficking, Sex - child, Conspiracy",10,Human Trafficking,1,Violent
+1120,"Human Trafficking, Sex - adult or no age specified",10,Human Trafficking,1,Violent
+1121,"Human Trafficking, Sex - adult or no age specified, Attempted",10,Human Trafficking,1,Violent
+1122,"Human Trafficking, Sex - adult or no age specified, Conspiracy",10,Human Trafficking,1,Violent
+1130,"Human Trafficking, Labor - child",10,Human Trafficking,1,Violent
+1131,"Human Trafficking, Labor - child, Attempted",10,Human Trafficking,1,Violent
+1132,"Human Trafficking, Labor - child, Conspiracy",10,Human Trafficking,1,Violent
+1140,"Human Trafficking, Labor - adult or no age specified",10,Human Trafficking,1,Violent
+1141,"Human Trafficking, Labor - adult or no age specified, Attempted",10,Human Trafficking,1,Violent
+1142,"Human Trafficking, Labor - adult or no age specified, Conspiracy",10,Human Trafficking,1,Violent
+1150,"Human Trafficking, Unspecified - child",10,Human Trafficking,1,Violent
+1151,"Human Trafficking, Unspecified - child, Attempted",10,Human Trafficking,1,Violent
+1152,"Human Trafficking, Unspecified - child, Conspiracy",10,Human Trafficking,1,Violent
+1160,"Human Trafficking, Unspecified - adult or no age specified",10,Human Trafficking,1,Violent
+1161,"Human Trafficking, Unspecified - adult or no age specified, Attempted",10,Human Trafficking,1,Violent
+1162,"Human Trafficking, Unspecified - adult or no age specified, Conspiracy",10,Human Trafficking,1,Violent
+1170,Human Trafficking,10,Human Trafficking,1,Violent
+1171,"Human Trafficking, Attempted",10,Human Trafficking,1,Violent
+1172,"Human Trafficking, Conspiracy",10,Human Trafficking,1,Violent
+1180,Armed Robbery,11,Armed robbery,1,Violent
+1181,"Armed Robbery, Attempted",11,Armed robbery,1,Violent
+1182,"Armed Robbery, Conspiracy",11,Armed robbery,1,Violent
+1190,Unarmed Robbery,12,Unarmed robbery,1,Violent
+1191,"Unarmed Robbery, Attempted",12,Unarmed robbery,1,Violent
+1192,"Unarmed Robbery, Conspiracy",12,Unarmed robbery,1,Violent
+1200,Aggravated Assault,13,Aggravated assault,1,Violent
+1201,"Aggravated Assault, Attempted",13,Aggravated assault,1,Violent
+1202,"Aggravated Assault, Conspiracy",13,Aggravated assault,1,Violent
+1210,Assault of an Officer,14,Assaulting public officer,1,Violent
+1211,"Assault of an Officer, Attempted",14,Assaulting public officer,1,Violent
+1212,"Assault of an Officer, Conspiracy",14,Assaulting public officer,1,Violent
+1220,Child Abuse,15,Child abuse,1,Violent
+1221,"Child Abuse, Attempted",15,Child abuse,1,Violent
+1222,"Child Abuse, Conspiracy",15,Child abuse,1,Violent
+1230,Simple Assault,16,Simple assault,1,Violent
+1231,"Simple Assault, Attempted",16,Simple assault,1,Violent
+1232,"Simple Assault, Conspiracy",16,Simple assault,1,Violent
+1240,Extortion/Threat,17,Blackmail/extortion/intimidation,1,Violent
+1241,"Extortion/Threat, Attempted",17,Blackmail/extortion/intimidation,1,Violent
+1242,"Extortion/Threat, Conspiracy",17,Blackmail/extortion/intimidation,1,Violent
+1250,Hit and Run with Bodily Injury,18,Hit and run driving - injury,1,Violent
+1251,"Hit and Run with Bodily Injury, Attempted",18,Hit and run driving - injury,1,Violent
+1252,"Hit and Run with Bodily Injury, Conspiracy",18,Hit and run driving - injury,1,Violent
+1990,"Violent Offense, Other",19,Violent offenses - other,1,Violent
+1991,"Violent Offense Other, Attempted",19,Violent offenses - other,1,Violent
+1992,"Violent Offense Other, Conspiracy",19,Violent offenses - other,1,Violent
+2010,Burglary,20,Burglary,2,Property
+2011,"Burglary, Attempted",20,Burglary,2,Property
+2012,"Burglary, Conspiracy",20,Burglary,2,Property
+2020,Arson,21,Arson,2,Property
+2021,"Arson, Attempted",21,Arson,2,Property
+2022,"Arson, Conspiracy",21,Arson,2,Property
+2030,Auto Theft,22,Auto theft,2,Property
+2031,"Auto Theft, Attempted",22,Auto theft,2,Property
+2032,"Auto Theft, Conspiracy",22,Auto theft,2,Property
+2040,Forgery/Fraud,23,Forgery/fraud,2,Property
+2041,"Forgery/Fraud, Attempted",23,Forgery/fraud,2,Property
+2042,"Forgery/Fraud, Conspiracy",23,Forgery/fraud,2,Property
+2050,Grand Theft (>$500),24,Grand larceny - theft over $500,2,Property
+2051,"Grand Theft (>$500), Attempted",24,Grand larceny - theft over $500,2,Property
+2052,"Grand Theft (>$500), Conspiracy",24,Grand larceny - theft over $500,2,Property
+2060,Petty Theft (=<$500),25,Petty larceny - theft equal or under $500,2,Property
+2061,"Petty Theft (=<$500), Attempted",25,Petty larceny - theft equal or under $500,2,Property
+2062,"Petty Theft (=<$500), Conspiracy",25,Petty larceny - theft equal or under $500,2,Property
+2070,"Theft, Value Unknown",26,Larceny/theft - value unknown,2,Property
+2071,"Theft, Value Unknown, Attempted",26,Larceny/theft - value unknown,2,Property
+2072,"Theft, Value Unknown, Conspiracy",26,Larceny/theft - value unknown,2,Property
+2080,Financial Crimes,27,Financial Crimes,2,Property
+2081,Financial Crimes Attempted,27,Financial Crimes,2,Property
+2082,Financial Crimes Conspiracy,27,Financial Crimes,2,Property
+2090,Sale of Stolen Property,28,Stolen property - trafficking,2,Property
+2091,"Sale of Stolen Property, Attempted",28,Stolen property - trafficking,2,Property
+2092,"Sale of Stolen Property, Conspiracy",28,Stolen property - trafficking,2,Property
+2100,Receiving Stolen Property,29,Stolen property - receiving,2,Property
+2101,"Receiving Stolen Property, Attempted",29,Stolen property - receiving,2,Property
+2102,"Receiving Stolen Property, Conspiracy",29,Stolen property - receiving,2,Property
+2110,Destruction of Property,30,Destruction of property,2,Property
+2111,"Destruction of Property, Attempted",30,Destruction of property,2,Property
+2112,"Destruction of Property, Conspiracy",30,Destruction of property,2,Property
+2120,Hit and Run Driving with Property Damage,31,Hit and run driving - property damage,2,Property
+2121,"Hit and Run Driving, Attempted",31,Hit and run driving - property damage,2,Property
+2122,"Hit and Run Driving, Conspiracy",31,Hit and run driving - property damage,2,Property
+2130,Unauthorized use of Vehicle,32,Unauthorized use of vehicle,2,Property
+2131,"Unauthorized use of Vehicle, Attempted",32,Unauthorized use of vehicle,2,Property
+2132,"Unauthorized use of Vehicle, Conspiracy",32,Unauthorized use of vehicle,2,Property
+2140,Criminal Trespass,33,Trespassing,2,Property
+2141,"Criminal Trespass, Attempted",33,Trespassing,2,Property
+2142,"Criminal Trespass, Conspiracy",33,Trespassing,2,Property
+2150,Possession of Property Crime Tools,34,Property offenses - other,2,Property
+2151,"Possession of Property Crime Tools, Attempted",34,Property offenses - other,2,Property
+2152,"Possession of Property Crime Tools, Conspiracy",34,Property offenses - other,2,Property
+2990,Other Property Offense,34,Property offenses - other,2,Property
+2991,"Other Property Offense, Attempt",34,Property offenses - other,2,Property
+2992,"Other Property Offense, Conspiracy",34,Property offenses - other,2,Property
+3010,Distribution Heroin,35,Distribution - heroin,3,Drug
+3011,"Distribution, Heroin, Attempted",35,Distribution - heroin,3,Drug
+3012,"Distribution, Heroin, Conspiracy",35,Distribution - heroin,3,Drug
+3020,Distribution of amphetamines,36,Distribution - amphetamines,3,Drug
+3021,"Distribution of amphetamines, Attempted",36,Distribution - amphetamines,3,Drug
+3022,"Distribution of amphetamines, Conspiracy",36,Distribution - amphetamines,3,Drug
+3030,Distribution Cocaine or Crack,37,Distribution - cocaine or crack,3,Drug
+3031,"Distribution Cocaine or Crack, Attempted",37,Distribution - cocaine or crack,3,Drug
+3032,"Distribution Cocaine or Crack, Conspiracy",37,Distribution - cocaine or crack,3,Drug
+3040,Distribution of opioids,38,Distribution of opioids,3,Drug
+3041,"Distribution of opioids, Attempted",38,Distribution of opioids,3,Drug
+3042,"Distribution of opioids, Conspiracy",38,Distribution of opioids,3,Drug
+3050,Distribution of prescription drugs,39,Distribution of prescription drugs,3,Drug
+3051,"Distribution of prescription drugs, Attempted",39,Distribution of prescription drugs,3,Drug
+3052,"Distribution of prescription drugs, Conspiracy",39,Distribution of prescription drugs,3,Drug
+3060,Distribution Other Controlled Substances,40,Distribution - other controlled substances,3,Drug
+3061,"Distribution Other Controlled Substances, Attempted",40,Distribution - other controlled substances,3,Drug
+3062,"Distribution Other Controlled Substances, Conspiracy",40,Distribution - other controlled substances,3,Drug
+3070,Distribution Marijuana,41,Distribution marijuana/hashish,3,Drug
+3071,"Distribution Marijuana, Attempted",41,Distribution marijuana/hashish,3,Drug
+3072,"Distribution Marijuana, Conspiracy",41,Distribution marijuana/hashish,3,Drug
+3080,"Distribution, Drug Unspecified",42,Distribution - drug unspecified,3,Drug
+3081,"Distribution, Drug Unspecified, Attempted",42,Distribution - drug unspecified,3,Drug
+3082,"Distribution, Drug Unspecified, Conspiracy",42,Distribution - drug unspecified,3,Drug
+3090,Possession/Use of Heroin,43,Possession/use - heroin,3,Drug
+3091,"Possession/Use of Heroin, Attempted",43,Possession/use - heroin,3,Drug
+3092,"Possession/Use of Heroin, Conspiracy",43,Possession/use - heroin,3,Drug
+3100,Possession of amphetamines,44,Possession of amphetamines,3,Drug
+3101,"Possession of amphetamines, Attempted",44,Possession of amphetamines,3,Drug
+3102,"Possession of amphetamines, Conspiracy",44,Possession of amphetamines,3,Drug
+3110,Possession/Use of Cocaine or Crack,45,Possession/use - cocaine or crack,3,Drug
+3111,"Possession/Use of Cocaine or Crack, Attempted",45,Possession/use - cocaine or crack,3,Drug
+3112,"Possession/Use of Cocaine or Crack, Conspiracy",45,Possession/use - cocaine or crack,3,Drug
+3120,Possession of opioids,46,Possession of opioids,3,Drug
+3121,"Possession of opioids, Attempted",46,Possession of opioids,3,Drug
+3122,"Possession of opioids, Conspiracy",46,Possession of opioids,3,Drug
+3130,Possession of prescription drugs,47,Possession of prescription drugs,3,Drug
+3131,"Possession of prescription drugs, Attempted",47,Possession of prescription drugs,3,Drug
+3132,"Possession of prescription drugs, Conspiracy",47,Possession of prescription drugs,3,Drug
+3140,Possession/Use of Other Controlled Substance,48,Possession/use - other controlled substances,3,Drug
+3141,"Possession/Use of Other Controlled Substance, Attempted",48,Possession/use - other controlled substances,3,Drug
+3142,"Possession/Use of Other Controlled Substance, Conspiracy",48,Possession/use - other controlled substances,3,Drug
+3150,Possession/Use of Marijuana,49,Possession/use - marijuana/hashish,3,Drug
+3151,"Possession/Use of Marijuana, Attempted",49,Possession/use - marijuana/hashish,3,Drug
+3152,"Possession/Use of Marijuana, Conspiracy",49,Possession/use - marijuana/hashish,3,Drug
+3160,Possession/Use of Unspecified Drug,50,Possession/use - drug unspecified,3,Drug
+3161,"Possession/Use, Drug Unspecified, Attempted",50,Possession/use - drug unspecified,3,Drug
+3162,"Possession/Use, Drug Unspecified, Conspiracy",50,Possession/use - drug unspecified,3,Drug
+3170,"Heroin Violation, Offense Unspecified",51,Heroin violation - offense unspecified,3,Drug
+3180,"Amphetamines, Offense unspecified",52,Amphetamines - offense unspecified,3,Drug
+3190,"Cocaine/Crack Violation, Offense Unspecified",53,Cocaine or crack violation offense unspecified,3,Drug
+3200,"Prescription of opioid drugs, offense unspecified",54,Prescription of opioid drugs - offense unspecified,3,Drug
+3210,"Prescription, offense unspecified",55,Prescription - offense unspecified,3,Drug
+3220,"Other Controlled Substance Violation, Offense Unspecified",56,Controlled substance - offense unspecified,3,Drug
+3230,"Marijuana Violation, Offense Unspecified",57,Marijuana/hashish violation - offense unspecified,3,Drug
+3240,Fraudulent Drug Offense,58,Other Drug Offense/Paraphernalia,3,Drug
+3241,"Fraudulent Drug Offense, Attempted",58,Other Drug Offense/Paraphernalia,3,Drug
+3242,"Fraudulent Drug Offense, Conspiracy",58,Other Drug Offense/Paraphernalia,3,Drug
+3250,Drug Paraphernalia,58,Other Drug Offense/Paraphernalia,3,Drug
+3251,"Drug Paraphernalia, Attempted",58,Other Drug Offense/Paraphernalia,3,Drug
+3252,"Drug Paraphernalia, Conspiracy",58,Other Drug Offense/Paraphernalia,3,Drug
+3990,Other Drug Offense,58,Other Drug Offense/Paraphernalia,3,Drug
+3991,"Other Drug Offense, Attempt",58,Other Drug Offense/Paraphernalia,3,Drug
+3992,"Other Drug Offense, Conspiracy",58,Other Drug Offense/Paraphernalia,3,Drug
+4010,Driving While Intoxicated,59,Driving while intoxicated,4,DUI Offense
+4011,"Driving While Intoxicated, Attempted",59,Driving while intoxicated,4,DUI Offense
+4012,"Driving While Intoxicated, Conspiracy",59,Driving while intoxicated,4,DUI Offense
+4020,Driving Under the Influence of Alcohol,60,Driving Under the Influence,4,DUI Offense
+4021,"Driving Under the Influence of Alcohol, Attempted",60,Driving Under the Influence,4,DUI Offense
+4022,"Driving Under the Influence of Alcohol, Conspiracy",60,Driving Under the Influence,4,DUI Offense
+4030,Driving Under the Influence of Drugs,61,Driving under influence - drugs,4,DUI Offense
+4031,"Driving Under the Influence of Drugs, Attempted",61,Driving under influence - drugs,4,DUI Offense
+4032,"Driving Under the Influence of Drugs, Conspiracy",61,Driving under influence - drugs,4,DUI Offense
+5010,Riot,62,Rioting,5,Public Order
+5011,"Riot, Attempting to Incite",62,Rioting,5,Public Order
+5012,"Riot, Conspiracy to Incite",62,Rioting,5,Public Order
+5020,Escape from Custody,63,Escape from custody,5,Public Order
+5021,"Escape from Custody, Attempted",63,Escape from custody,5,Public Order
+5022,"Escape from Custody, Conspiracy",63,Escape from custody,5,Public Order
+5030,Flight to Avoid Prosecution,64,Flight to avoid prosecution,5,Public Order
+5031,"Flight to Avoid Prosecution, Attempted",64,Flight to avoid prosecution,5,Public Order
+5032,"Flight to Avoid Prosecution, Conspiracy",64,Flight to avoid prosecution,5,Public Order
+5040,Weapons Offense,65,Weapon offense,5,Public Order
+5041,"Weapons Offense, Attempted",65,Weapon offense,5,Public Order
+5042,"Weapons Offense, Conspiracy",65,Weapon offense,5,Public Order
+5050,Habitual Offender,66,Habitual offender,5,Public Order
+5060,Parole Violation,67,Parole violation,5,Public Order
+5070,Probation Violation,68,Probation violation,5,Public Order
+5080,Contempt of Court/Violate Court Order,69,Contempt of court,5,Public Order
+5081,"Contempt of Court/Violate Court Order, Attempted",69,Contempt of court,5,Public Order
+5082,"Contempt of Court/Violate Court Order, Conspiracy",69,Contempt of court,5,Public Order
+5090,Other Court Offense,70,"Offenses against courts, legislatures and commissions",5,Public Order
+5091,"Other Court Offense, Attempted",70,"Offenses against courts, legislatures and commissions",5,Public Order
+5092,"Other Court Offense, Conspiracy",70,"Offenses against courts, legislatures and commissions",5,Public Order
+5100,Family or Custody Related Offense,71,Family related offenses,5,Public Order
+5101,"Family or Custody Related Offense, Attempted",71,Family related offenses,5,Public Order
+5102,"Family or Custody Related Offense, Conspiracy",71,Family related offenses,5,Public Order
+5110,Offense Against Morals/Decency,72,Morals/decency - offense,5,Public Order
+5111,"Offense Against Morals/Decency, Attempted",72,Morals/decency - offense,5,Public Order
+5112,"Offense Against Morals/Decency, Conspiracy",72,Morals/decency - offense,5,Public Order
+5120,Immigration Violation,73,Immigration violations,5,Public Order
+5121,"Immigration Violation, Attempted",73,Immigration violations,5,Public Order
+5122,"Immigration Violation, Conspiracy",73,Immigration violations,5,Public Order
+5130,Obstruction/Resisting,74,Obstruction - law enforcement,5,Public Order
+5131,"Obstruction/Resisting, Attempted",74,Obstruction - law enforcement,5,Public Order
+5132,"Obstruction/Resisting, Conspiracy",74,Obstruction - law enforcement,5,Public Order
+5140,Invasion of Privacy,75,Invasion of privacy,5,Public Order
+5141,"Invasion of Privacy, Attempted",75,Invasion of privacy,5,Public Order
+5142,"Invasion of Privacy, Conspiracy",75,Invasion of privacy,5,Public Order
+5150,Commercialized Vice,76,Commercialized vice,5,Public Order
+5151,"Commercialized Vice, Attempted",76,Commercialized vice,5,Public Order
+5152,"Commercialized Vice, Conspiracy",76,Commercialized vice,5,Public Order
+5160,Contributing to the Delinquency of a Minor,77,Contributing to delinquency of a minor,5,Public Order
+5161,"Contributing to the Delinquency of a Minor, Attempted",77,Contributing to delinquency of a minor,5,Public Order
+5162,"Contributing to the Delinquency of a Minor, Conspiracy",77,Contributing to delinquency of a minor,5,Public Order
+5170,Disorderly Conduct Offense,78,Drunkenness/Vagrancy/Disorderly Conduct,5,Public Order
+5171,"Disorderly Conduct Offense, Attempted",78,Drunkenness/Vagrancy/Disorderly Conduct,5,Public Order
+5172,"Disorderly Conduct Offense, Conspiracy",78,Drunkenness/Vagrancy/Disorderly Conduct,5,Public Order
+5180,Liquor Law Violation,79,Liquor law violations,5,Public Order
+5181,"Liquor Law Violation, Attempted",79,Liquor law violations,5,Public Order
+5182,"Liquor Law Violation, Conspiracy",79,Liquor law violations,5,Public Order
+5190,Taxation Offense,80,Taxation Offenses,5,Public Order
+5191,"Taxation Offense, Attempted",80,Taxation Offenses,5,Public Order
+5192,"Taxation Offense, Conspiracy",80,Taxation Offenses,5,Public Order
+5200,Bribery/Conflict of Interest,81,Bribery and conflict of interest,5,Public Order
+5201,"Bribery/Conflict of Interest, Attempt",81,Bribery and conflict of interest,5,Public Order
+5202,"Bribery/Conflict of Interest, Conspiracy",81,Bribery and conflict of interest,5,Public Order
+5990,"Public Order Offense, Other",82,Public order offenses - other,5,Public Order
+5991,"Public Order Offense, Other, Attempted",82,Public order offenses - other,5,Public Order
+5992,"Public Order Offense, Other, Conspiracy",82,Public order offenses - other,5,Public Order
+6010,"Traffic Offense, Minor",84,Traffic offenses - minor,6,Criminal traffic
+9999,Not Known/Missing,999,Not Known/Missing,999,Not Known/Missing
