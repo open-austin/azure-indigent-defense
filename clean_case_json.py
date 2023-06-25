@@ -30,9 +30,7 @@ for i, charge in enumerate(input_dict["charge information"]):
     }
     charge_datetime = dt.datetime.strptime(charge["date"], "%m/%d/%Y")
     charge_dates.append(charge_datetime)
-    charge_dict["primary_charge_date"] = dt.datetime.strftime(
-        charge_datetime, "%Y-%m-%d"
-    )
+    charge_dict["charge_date"] = dt.datetime.strftime(charge_datetime, "%Y-%m-%d")
     # Umichigan mapping
     charge_dict.update(charge_name_to_umich[charge["charges"]])
 
