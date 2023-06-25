@@ -12,7 +12,7 @@ select_events <- charges %>%
   group_by(case_number) %>%
   filter(all(event_date >= earliest_charge_date)) %>%
   ungroup()
-
+# It looks like we read all events, then if any lines contain these strings, these are the "motions", otherwise ignore
 good_motions <- c('Motion To Suppress', 'Motion to Reduce Bond', 'Motion to Reduce Bond Hearing',
                   'Motion for Production', 'Motion For Speedy Trial', 'Motion for Discovery', 'Motion In Limine')
 

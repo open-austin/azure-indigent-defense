@@ -1,31 +1,16 @@
 import json
 import datetime as dt
-import csv
-
-# Create mapping file
-
-uccs_filepath = "josh_scratch/uccs_schema.csv"
-with open(uccs_filepath, mode="r") as file:
-    # reading the CSV file
-    csvFile = csv.DictReader(file)
-
-    # create a dictionary
-    uccs_dict = {
-        row["uccs_code"]: {
-            "charge_desc": row["charge_desc"],
-            "offense_category_desc": row["offense_category_desc"],
-            "offense_type_desc": row["offense_type_desc"],
-        }
-        for row in csvFile
-    }
-
-uccs_filepath = "josh_scratch/results.csv"
 
 
 # Original Format
 in_file = "josh_scratch/case_input_multicharge.json"
 with open(in_file, "r") as f:
     input_dict = json.load(f)
+
+# Get mappings of charge names to umich decsriptions
+charge_name_to_umich_file = "josh_scratch/charge_name_to_descs.json"
+with open(charge_name_to_umich_file, "r") as f:
+    charge_name_to_umich = json.load(f)
 
 # Cleaned Case Primary format
 out_file = {}
@@ -48,7 +33,8 @@ for i, charge in enumerate(input_dict["charge information"]):
     charge_dict["primary_charge_date"] = dt.datetime.strftime(
         charge_datetime, "%Y-%m-%d"
     )
-    # TODO: num_counts (do we actually need this?), umichigan mapping
+    # Umichigan mapping
+    charge_dict.update(charge_name_to_umich[charge["charges"]])
 
     out_file["charges"].append(charge_dict)
 out_file["earliest_charge_date"] = dt.datetime.strftime(min(charge_dates), "%Y-%m-%d")
