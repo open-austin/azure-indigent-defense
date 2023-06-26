@@ -32,6 +32,18 @@ Make sure to install version 4.
 
 **Alternative:** Install [Docker Engine](https://docs.docker.com/engine/install/) for only the docker runtime.
 
+### Azure CLI
+
+**NOTE:** This prerequisite is only needed if you plan to deploy to Azure. You can run functions locally without this.
+
+Follow [How to install Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
+
+Run the following command after install:
+
+```sh
+az login
+```
+
 ### Notes for Macbook M1 Users
 
 Skip this section if you're not developing on a [M1 Macbook](https://support.apple.com/en-us/HT211814).
@@ -75,7 +87,7 @@ Wait for the functions to start up. Then look for a differently-colored line tha
 
 ```txt
 http-scraper: [GET,POST] http://localhost:7071/api/http-scraper
-``` 
+```
 
 That is the URL you will use in the next step.
 
@@ -84,7 +96,7 @@ That is the URL you will use in the next step.
 Now that the function is deployed, you can make a request to the function.
 Run this command in a new terminal window:
 
-```shell
+```sh
 curl -i -XPOST \
     "http://localhost:7071/api/http-scraper" \
     -d @testdata/payload.json
@@ -110,6 +122,19 @@ When you run the function app locally, it will still be talking to blob containe
 However, it's a good idea to at least verify final code on Azure before opening a pull request.
 Changes merged into main will then be published on the prod environment.
 
-Publish to Azure with the command `func azure functionapp publish indigent-defense-stats-dev-function-app`. 
-(You need to be logged in to Azure CLI.) That's our dev environment, so deploy there as much as you like;
+Login to the Azure CLI, then publish to Azure with the command:
+
+```sh
+func azure functionapp publish indigent-defense-stats-dev-function-app
+```
+
+That's our dev environment, so deploy there as much as you like; 
 it's meant to be played with and broken.  
+
+You can test the function with the same command as testing locally, with a different URL:
+
+```sh
+curl -i -XPOST \
+    "https://indigent-defense-stats-dev-function-app.azurewebsites.net/api/http-scraper" \
+    -d @testdata/payload.json
+```
