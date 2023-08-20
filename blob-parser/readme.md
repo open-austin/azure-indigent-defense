@@ -3,7 +3,13 @@
 Blob parser parses the HTML from the Blob Storage into JSON for the cosmos DB.
 It then inserts the data into the DB.
 
-Note that this function produces a lot of output after starting the function app, because it is continuously checking for its trigger. For this reason, you may want to disable this function during local development if it's not needed. To do this, click the 'A' in VS Code sidebar, find the function at the bottom under Workspace > Local Project > Functions, right-click on it and click Disable. You can use the same menu to re-enable it when you need it again.
+Note that this function produces a lot of output after starting the function app, because it is continuously checking for its trigger. For this reason, you may want to disable this function during local development if it's not needed. To do this using the [Azure Functions VS Code extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions):
+
+1. Click the 'A' in VS Code sidebar.
+2. Find the function at the bottom under `Workspace > Local Project > Functions`.
+3. Right-click on it and click `Disable`.
+
+You can use the same menu to re-enable it when you need it again.
 
 Triggered by blob storage.
 

@@ -14,6 +14,12 @@ You need this file to deploy and test your code.
 
 Do NOT check this file into git or share it with others, as it contains secret keys with access to our Azure account.
 
+### VS Code
+
+Visual Studio Code is our main IDE. We recommend all developers use this for consistency.
+
+In addition, install the [Azure Functions VS Code extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions) for easier emulation and deployments to Azure.
+
 ### Python
 
 This project requires `python 3.9`. You **must** use this specific version.
