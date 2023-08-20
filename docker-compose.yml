@@ -2,7 +2,7 @@ version: '2'
 services:
   python:
     build: .
-    command: sh -c "func start"
+    command: sh -c "func start --verbose"
     platform: linux/arm64
     ports:
       - 7071:7071
