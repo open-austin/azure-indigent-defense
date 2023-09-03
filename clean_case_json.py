@@ -1,6 +1,16 @@
 import json
 import datetime as dt
 
+# List of motions identified as evidenciary
+good_motions = [
+    "Motion To Suppress",
+    "Motion to Reduce Bond",
+    "Motion to Reduce Bond Hearing",
+    "Motion for Production",
+    "Motion For Speedy Trial",
+    "Motion for Discovery",
+    "Motion In Limine",
+]
 
 # Original Format
 in_file = "josh_scratch/case_input_multicharge.json"
@@ -36,6 +46,25 @@ for i, charge in enumerate(input_dict["charge information"]):
 
     out_file["charges"].append(charge_dict)
 out_file["earliest_charge_date"] = dt.datetime.strftime(min(charge_dates), "%Y-%m-%d")
+
+
+def contains_good_motion(motion, event):
+    """Recursively check if a motion exists in an event list or sublist."""
+    if isinstance(event, list):
+        return any(contains_good_motion(motion, item) for item in event)
+    return motion.lower() in event.lower()
+
+
+# Iterate through every event and see if one of our "good motions" is in it
+motions_in_events = [
+    motion
+    for motion in good_motions
+    if contains_good_motion(motion, input_dict["other events and hearings"])
+]
+out_file["motions"] = motions_in_events
+out_file["has_evidence_of_representation"] = len(motions_in_events) > 0
+
+
 # Original Format
 out_filepath = "josh_scratch/cleaned_case_output_scriptresults.json"
 with open(out_filepath, "w") as f:
